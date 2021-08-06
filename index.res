@@ -293,59 +293,6 @@
 
 <script type="text/javascript">
 
-    function fetchCE() {
-      HashMap<String, List<String>> hostIdsAndTests = new HashMap<String, List<String>>();
-    
-	    Page listElement = new Page(null, "sitesonar/sonar_list.res");
-      Page filterElement = new Page(null, "sitesonar/filterItem.res");
-
-      final DB filteredDB = new DB("SELECT host_id, test_name FROM sitesonar_tests;");
-
-       // Fill hostIdsAndTests hashmap
-      while(filteredDB.moveNext()){
-          if(!hostIdsAndTests.containsKey(filteredDB.gets(1))){
-              ArrayList<String> initList = new ArrayList<String>();
-              initList.add(filteredDB.gets(2));
-              hostIdsAndTests.put(filteredDB.gets(1), initList);
-          }
-
-          //add value to already existing row
-          else{
-              List<String> valueList = hostIdsAndTests.get(filteredDB.gets(1));
-              valueList.add(filteredDB.gets(2));
-              hostIdsAndTests.put(filteredDB.gets(1), valueList);
-          }
-      }
-
-      //Loop over HashMap
-        for (String key : hostIdsAndTests.keySet()){
-
-            //Get ce name for this 
-            final DB ceNameDB = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id=" + key + ";");
-            String ceName = ceNameDB.gets(1);
-            //Check if it is supported or not according to grouping
-            final DB supportGrouping = new DB("SELECT test_message FROM sitesonar_tests WHERE host_id=" + key + " AND test_name='singularity';");
-            
-            //out.println(supportGrouping.gets(1));
-
-
-            //TODO: bug here. It adds one to all arrays
-            //For singularity
-            if(supportGrouping.gets(1).equals("SUPPORTED")){
-                //out.println(ceName);
-                int[] ceArray = siteCEs.get(ceName);
-                ceArray[0] += 1;
-                siteCEs.put(ceName, ceArray);
-                //out.println(ceName + ": " + siteCEs.get(ceName)[0]);
-            }
-            else{
-                //out.println(ceName);
-                int[] ceArray = siteCEs.get(ceName);
-                ceArray[1] += 1;
-                siteCEs.put(ceName, ceArray);
-            }
-        }
-
         //out.println("CERN:" + siteCEs.get("CERN")[0]);
         //out.println("ISS:" + siteCEs.get("ISS")[0]);
         //Render list

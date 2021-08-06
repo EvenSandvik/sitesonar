@@ -117,15 +117,27 @@
 
     //TODO, make asynchronous
     //final DB filteredDB = new DB("SELECT host_id, test_name FROM sitesonar_tests WHERE " + filterCategory[0] + ";");
-    final DB filteredDB = new DB("SELECT host_id, test_name FROM sitesonar_tests;");
+    final DB filteredDB = new DB("SELECT host_id, test_name, site_name FROM sitesonar_tests;");
 
     // Group by
     String grouping = "Support";
 
+    //test update
+    //new DB("UPDATE sitesonar_tests SET site_name='' WHERE host_id = '1236838004' ;");
 
-    // TODO: ERROR WITH f variable. How to add filters9
-    // Fill hostIdsAndTests hashmap
+    
+
+
+    // Initialize hostIdsAndTests hashmap
     while(filteredDB.moveNext()){
+
+        //Fill site_name field if empty. TODO: test comment out and speed increase
+        if(filteredDB.gets(3) == "" || filteredDB.gets(3) == null || filteredDB.gets(3).length() == 0){
+            String key = filteredDB.gets(1);
+            DB stringName = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id='" + key + "';");
+            new DB("UPDATE sitesonar_tests SET site_name='" + stringName.gets(1) + "' WHERE host_id = '" + key + "' ;");
+        }
+
         if(!hostIdsAndTests.containsKey(filteredDB.gets(1))){
             ArrayList<String> initList = new ArrayList<String>();
             initList.add(filteredDB.gets(2));
@@ -140,22 +152,14 @@
         }
     }
 
-    //test hashmap
-    /*HashMap<String, int[]> testHash = new HashMap<String, int[]>();
-    int initA[] = { 1, 2, 3 };
-    int initB[] = { 5, 5, 5 };
-    testHash.put("A", initA);
-    testHash.put("B",initB);
-    out.println("A: " + testHash.get("A")[1]);
-    out.println("B: " + testHash.get("B")[1]);*/
-
     // TODO: Add tests to site.
     //Loop over HashMap
         for (String key : hostIdsAndTests.keySet()){
 
             //Get ce name for this 
-            final DB ceNameDB = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id=" + key + ";");
-            String ceName = ceNameDB.gets(1);
+            //final DB ceNameDB = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id=" + key + ";");
+            String ceName = ceNameDB.gets(3);
+
             //Check if it is supported or not according to grouping
             final DB supportGrouping = new DB("SELECT test_message FROM sitesonar_tests WHERE host_id=" + key + " AND test_name='singularity';");
             
