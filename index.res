@@ -273,8 +273,8 @@
                         <button class="addfilter-button" style="position:absolute;right: 0; color: #5188CA;padding: 0.5rem 1rem;">Apply</button>
 
                         <table style="width:100%; margin-top:3rem;">
-                            <tr style="background-color: #F2F2F2;">
-                                <th class="list-element" style="color: #757575; font-weight: bold; ">Site Name</th>
+                            <tr style="background-color: #c7daff;">
+                                <th class="list-element" style="font-weight: bold; ">Site Name</th>
                                 <<:list_header:>>
                             </tr>
                             <<:testList:>>
@@ -293,26 +293,26 @@
 
 <script type="text/javascript">
 
-        //out.println("CERN:" + siteCEs.get("CERN")[0]);
-        //out.println("ISS:" + siteCEs.get("ISS")[0]);
-        //Render list
-        Page listHeaderSupport = new Page(null, "sitesonar/listHeader.res");
-        Page listHeaderNotSupport = new Page(null, "sitesonar/listHeader.res");
-        listHeaderSupport.modify("header_name", grouping);
-        listHeaderNotSupport.modify("header_name", "Not supported");
-        
-        p.append("list_header", listHeaderSupport);
-        p.append("list_header", listHeaderNotSupport);
-        final DB listDB = new DB("SELECT host_id FROM sitesonar_tests");
+    //var mysql = require('mysql');
 
-        for(int i = 0; i < sites.size(); i++) {
-            listElement.modify("site_name", sites.get(i));
-            listElement.modify("group_by", siteCEs.get(sites.get(i))[0]);
-            listElement.modify("not_group_by", siteCEs.get(sites.get(i))[1]);
-            p.append("testList", listElement);
-        }
-        p.modify("n_sites", sites.size());
-    }
+    //sql connection
+    var con = mysql.createConnection({
+      host: "localhost",
+      user: "mon_user",
+      password: "",
+      database: "mon_data"
+    });
+
+
+    //Select one test
+    con.connect(function(err) {
+      if (err) throw err;
+      con.query("SELECT * FROM sitesonar_tests LIMIT 1", function (err, result, fields) {
+        if (err) throw err;
+        console.log(result);
+      });
+    });
+
 
     var sitesButton = document.getElementById("sitesBtn");
     
@@ -321,8 +321,6 @@
     var sitesPage = document.getElementById("sitesPage");
 
     var nodesPage = document.getElementById("AllNodesPage");
-
-   
 
     sitesButton.onclick = function () {
       console.log("clicked sites button");

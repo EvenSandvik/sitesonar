@@ -1,4 +1,13 @@
 <%@ page import="lia.Monitor.Store.Fast.DB,alimonitor.*,lazyj.*,java.util.*,java.io.*,java.text.SimpleDateFormat,lia.Monitor.Store.*,lia.web.utils.Formatare,lia.web.utils.DoubleFormat,lia.Monitor.monitor.*"%>
+
+<html>
+   <body>
+      Hello World!<br/>
+      <%
+         out.println("Your IP address is " + request.getRemoteAddr());
+      %>
+   </body>
+</html>
 <%
     lia.web.servlets.web.Utils.logRequest("START /sitesonar/index.jsp", 0, request);
 
@@ -81,18 +90,11 @@
     p.append("siteId", siteId);
 
 
-
-
-
-
-
-
-
     // -------------------
 
     //TODO: should this logic be in the index.res script?? Because it needs the button clicks on the page
 	// List
-    HashMap<String, List<String>> hostIdsAndTests = new HashMap<String, List<String>>();
+    HashMap<String, Integer> hostIdsAndTests = new HashMap<String, Integer>();
     
 	Page listElement = new Page(null, "sitesonar/sonar_list.res");
     Page filterElement = new Page(null, "sitesonar/filterItem.res");
@@ -100,24 +102,24 @@
 
     // Filters
     // Collect host_ids of tests that satisfy filter
-    String[] filterCategory = {"test_name='singularity' AND test_message='SUPPORTED'"};
-    int filters = filterCategory.length;
-    String filterString = ""; 
+    //String[] filterCategory = {"test_name='singularity' AND test_message='SUPPORTED'"};
+    //int filters = filterCategory.length;
+    //String filterString = ""; 
 
 
     //Put filters together
-    for(int i = 0; i < filters; i++){
+    /*for(int i = 0; i < filters; i++){
         filterString += filterCategory[i] + "OR";
     }
     //Render filters
     for(int i = 0; i < filters; i++){
         filterElement.modify("filter_name", filterCategory[i]);
         p.append("filters", filterElement);
-    }
+    }*/
 
     //TODO, make asynchronous
-    //final DB filteredDB = new DB("SELECT host_id, test_name FROM sitesonar_tests WHERE " + filterCategory[0] + ";");
-    final DB filteredDB = new DB("SELECT host_id, test_name, site_name FROM sitesonar_tests;");
+    //final DB entireDB = new DB("SELECT host_id, test_name FROM sitesonar_tests WHERE " + filterCategory[0] + ";");
+    final DB entireDB = new DB("SELECT host_id, test_message, site_name FROM sitesonar_tests WHERE test_name='singularity';");
 
     // Group by
     String grouping = "Support";
@@ -128,37 +130,42 @@
     
 
 
+
+    HashMap<String, Integer> countSupportForSites = new HashMap<String, Integer>();
+    HashMap<String, Integer> countNotSupportForSites = new HashMap<String, Integer>();
     // Initialize hostIdsAndTests hashmap
-    while(filteredDB.moveNext()){
+    while(entireDB.moveNext()){
 
         //Fill site_name field if empty. TODO: test comment out and speed increase
-        if(filteredDB.gets(3) == "" || filteredDB.gets(3) == null || filteredDB.gets(3).length() == 0){
-            String key = filteredDB.gets(1);
+        /*if(entireDB.gets(3) == "" || entireDB.gets(3) == null || entireDB.gets(3).length() == 0){
+            String key = entireDB.gets(1);
             DB stringName = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id='" + key + "';");
             new DB("UPDATE sitesonar_tests SET site_name='" + stringName.gets(1) + "' WHERE host_id = '" + key + "' ;");
-        }
+        }*/
 
-        if(!hostIdsAndTests.containsKey(filteredDB.gets(1))){
-            ArrayList<String> initList = new ArrayList<String>();
-            initList.add(filteredDB.gets(2));
-            hostIdsAndTests.put(filteredDB.gets(1), initList);
+
+        ////////TODO: Create new branch. drop hashmap, just go straight to counting. Maybe hashmap with [sitename, countWhichSupportGrouping]
+        if(!countSupportForSites.containsKey(entireDB.gets(3))){
+            countSupportForSites.put(entireDB.gets(3), 0);
+            countNotSupportForSites.put(entireDB.gets(3), 0);
         }
 
         //add value to already existing row
+        if(entireDB.gets(2).equals("SUPPORTED")){
+            countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))+1));
+        }
         else{
-            List<String> valueList = hostIdsAndTests.get(filteredDB.gets(1));
-            valueList.add(filteredDB.gets(2));
-            hostIdsAndTests.put(filteredDB.gets(1), valueList);
+            countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
         }
     }
 
     // TODO: Add tests to site.
     //Loop over HashMap
-        for (String key : hostIdsAndTests.keySet()){
+        /*for (String key : hostIdsAndTests.keySet()){
 
             //Get ce name for this 
             //final DB ceNameDB = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id=" + key + ";");
-            String ceName = ceNameDB.gets(3);
+            String ceName = entireDB.gets(3);
 
             //Check if it is supported or not according to grouping
             final DB supportGrouping = new DB("SELECT test_message FROM sitesonar_tests WHERE host_id=" + key + " AND test_name='singularity';");
@@ -181,7 +188,7 @@
                 ceArray[1] += 1;
                 siteCEs.put(ceName, ceArray);
             }
-        }
+        }*/
 
     //out.println("CERN:" + siteCEs.get("CERN")[0]);
     //out.println("ISS:" + siteCEs.get("ISS")[0]);
@@ -197,8 +204,8 @@
 
     for(int i = 0; i < sites.size(); i++) {
         listElement.modify("site_name", sites.get(i));
-        listElement.modify("group_by", siteCEs.get(sites.get(i))[0]);
-        listElement.modify("not_group_by", siteCEs.get(sites.get(i))[1]);
+        listElement.modify("group_by", countSupportForSites.get(sites.get(i)));
+        listElement.modify("not_group_by", countNotSupportForSites.get(sites.get(i)));
         p.append("testList", listElement);
     }
     p.modify("n_sites", sites.size());
