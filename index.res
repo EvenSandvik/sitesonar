@@ -4,6 +4,7 @@
 .flex-wrapper {
   display: flex;
   flex-flow: row nowrap;
+  width: 5rem;
 }
 
 .single-chart {
@@ -167,7 +168,7 @@
                         <div style="position:absolute; right:0; top: 0; display:flex;">
                             <div style="margin-right:1rem">
                             <p style="margin-bottom: 0">Covered</p> 
-                            <div class="flex-wrapper">
+                            <div class="flex-wrapper" style="width: 5rem">
                                 <div class="single-chart">
                                     <svg viewBox="0 0 36 36" class="circular-chart green">
                                     <path class="circle-bg"
@@ -176,12 +177,12 @@
                                         a 15.9155 15.9155 0 0 1 0 -31.831"
                                     />
                                     <path class="circle"
-                                        stroke-dasharray="60, 100"
+                                        stroke-dasharray=<<:percentTotal:>> + ", 100"
                                         d="M18 2.0845
                                         a 15.9155 15.9155 0 0 1 0 31.831
                                         a 15.9155 15.9155 0 0 1 0 -31.831"
                                     />
-                                    <text x="18" y="20.35" class="percentage"> (<<:covered_count:>> / <<:result_count:>>) </text>
+                                    <text x="18" y="20.35" class="percentage"> <<:percentTotal:>>%</text>
                                     </svg>
                                 </div>
                                 </div>
@@ -189,11 +190,58 @@
                             <div><p>Total</p> <p><<:n_sites:>></p></div>
                         </div>
                         <br></br>
+
+                        <div id="groupByID">
+                          <button id="groupBtn" class="addfilter-button">Group by</button>
+                          <div style="display: flex">
+                            <div id="groupModal" class="dropdown-modal">
+                                <ul class="filter-list">
+                                  <li id="liCustomGroup" class="filter-category">Custom Parameter</li>
+                                  <li id="liHMDGroup"><p class="filter-category">HMD</p></li>
+                                  <li id="liLoopGroup" class="filter-category">Loop devices</li>
+                                  <li id="liContainerGroup" class="filter-category">Container enables</li>
+                                  <li id="liUnameGroup" class="filter-category">Uname</li>
+                                  <li id="liSingularityGroup" class="filter-category">Singularity</li>
+                                  <li id="liTMPGroup" class="filter-category">TMP</li>
+                                  <li id="liUnderlayGroup" class="filter-category">Underlay</li>
+                                  <li id="liOverlayGroup" class="filter-category">Overlay</li>
+                                </ul>
+                            </div>
+
+                            <!-- All menus -->
+                            <div id="customGroup" class="filter-selected-menu">
+                                <p>Test name</p>
+                                <input id="customGroupParameter" type="text" />
+                                <p>Test value</p>
+                                <input id="customValueParameter" type="text" />
+                                <button onClick="customGrouping()">Submit</button>
+                            </div>
+
+                            <div id="singularityGroup" class="filter-selected-menu">
+                              <ul class="filter-list">
+                                <li class="filter-category">All</li>
+                                <li class="filter-category" onclick="setParameters('singularity', 'SUPPORTED')">Support singularity</li>
+                                <li class="filter-category" onclick="setParameters('singularity', '')">Not support singularity</li>
+                              </ul>
+                            </div>
+
+
+                          </div>
+                        </div>
+
+                        <div>
+                          <p id="groupingText" style="font-size: 0.85rem; color: #444;"><<:groupParam:>>: <<:valueParam:>></p>
+                        </div>
+
+                          
+
+                        <br></br>
+
                         <div>
                           <button id="myBtn" class="addfilter-button">Add filter +</button>
 
                           <div style="display: flex">
-                            <div id="myModal" class="dropdown-modal">
+                            <div id="filterModal" class="dropdown-modal">
                               <ul class="filter-list">
                                 <li id="liCustom" class="filter-category">Custom Parameter</li>
                                 <li id="liHMD"><p class="filter-category">HMD</p></li>
@@ -266,11 +314,7 @@
                         <div style="display: flex;">
                           <<:filters:>>
                         </div>
-
-                        <div>
-                          <button class="addfilter-button">Group by</button>
-                        </div>
-                        <button class="addfilter-button" style="position:absolute;right: 0; color: #5188CA;padding: 0.5rem 1rem;">Apply</button>
+                        <button onclick="replace_search('grouping')" class="addfilter-button" style="position:absolute;right: 0; color: #5188CA;padding: 0.5rem 1rem;">Apply</button>
 
                         <table style="width:100%; margin-top:3rem;">
                             <tr style="background-color: #c7daff;">
@@ -293,26 +337,92 @@
 
 <script type="text/javascript">
 
-    //var mysql = require('mysql');
+    //TODO: get this values from the jsp
+    //Set these values
+    var groupingParam = "";
 
-    //sql connection
-    var con = mysql.createConnection({
-      host: "localhost",
-      user: "mon_user",
-      password: "",
-      database: "mon_data"
-    });
+    var valueParam = "";
 
+    var filterArrayParam = [];
 
-    //Select one test
-    con.connect(function(err) {
-      if (err) throw err;
-      con.query("SELECT * FROM sitesonar_tests LIMIT 1", function (err, result, fields) {
-        if (err) throw err;
-        console.log(result);
-      });
-    });
+    function setParameters(group, val){
+      groupingParam = group;
+      valueParam = val;
+    }
 
+    function changeGroupText(){
+      if(groupingParam != ""){
+        document.getElementById("groupingText").innerHTML = groupingParam + ": " + valueParam;
+      }
+    }
+    
+    
+
+    function customGrouping() {
+      groupingParam = document.getElementById("customGroupParameter").value;
+      valueParam = document.getElementById("customValueParameter").value;
+      changeGroupText();
+    }
+
+    //TODO: edit to make it possible for multiple parameters
+    //add parameters to url when clicking apply
+    function replace_search(name) {
+      var url = location.search;
+      if (new RegExp("[&?]"+name+"([=&].+)?$").test(url)) {
+            url = url.replace(new RegExp("(?:[&?])"+name+"[^&]*", "g"), "")
+        }
+
+      if(groupingParam != ""){
+        //Add grouping parameter
+        url += "?grouping=" + groupingParam;
+
+        if(valueParam != ""){
+          url += "&value=" + valueParam;
+        }
+        else{
+          //Must have value
+        }
+
+        if(filterArrayParam.length != 0){
+          url += "&filter=" + "test";
+        }
+      }
+      else{
+        //Must have grouping
+
+      }
+        // there is an official order for the query and the hash
+        location.assign(location.origin + location.pathname + url + location.hash)
+    };
+
+    //function for hiding all list extensions
+    function requestAndRefresh() {
+      console.log("Clicked apply");
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", "http://localhost:8080/sitesonar/", true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify({
+          value: "testValue"
+      }));
+
+      var xhr = new XMLHttpRequest();
+      // we defined the xhr
+
+      xhr.onreadystatechange = function () {
+          if (this.readyState != 4) return;
+
+          if (this.status == 200) {
+              var data = JSON.parse(this.responseText);
+
+              // we get the returned data
+          }
+
+          // end of state change: it can be after some time (async)
+      };
+
+      xhr.open('GET', "http://localhost:8080/sitesonar/", true);
+      xhr.send();
+    }
 
     var sitesButton = document.getElementById("sitesBtn");
     
@@ -321,6 +431,8 @@
     var sitesPage = document.getElementById("sitesPage");
 
     var nodesPage = document.getElementById("AllNodesPage");
+
+    //TODO: Create groupby custom parameter
 
     sitesButton.onclick = function () {
       console.log("clicked sites button");
@@ -342,16 +454,25 @@
 
     var showModal = false;
 
+    var showGroupByModal = false;
+
     // Get the modal
-    var modal = document.getElementById("myModal");
+    var modal = document.getElementById("filterModal");
+
+    var groupModal = document.getElementById("groupModal");
 
     // Get the button that opens the modal
     var btn = document.getElementById("myBtn");
 
+    // get group by button
+    var groupBtn = document.getElementById("groupBtn");
+
     //Get custom parameter list item
     var liCustom = document.getElementById("liCustom");
+    var liCustomGroup = document.getElementById("liCustomGroup");
 
     var customParameter = document.getElementById("custom");
+    var customParameterGroup = document.getElementById("customGroup");
 
     //Get HMD list item
     var liHMD = document.getElementById("liHMD");
@@ -374,9 +495,13 @@
     var uname = document.getElementById("uname");
 
     //Singularity
-    var liSIngularity = document.getElementById("liSIngularity");
+    var liSingularity = document.getElementById("liSingularity");
 
     var singularity = document.getElementById("singularity");
+
+    var liSingularityGroup = document.getElementById("liSingularityGroup");
+
+    var singularityGroup = document.getElementById("singularityGroup");
 
     //TMP
     var liTMP = document.getElementById("liTMP");
@@ -399,6 +524,11 @@
       customParameter.style.display = "block";
     });
 
+    liCustomGroup.addEventListener("mouseenter", function (event) {
+      hideAllFilters();
+      customParameterGroup.style.display = "block";
+    });
+
     //when hover over HMD
     liHMD.addEventListener("mouseenter", function (event) {
       hideAllFilters();
@@ -411,22 +541,28 @@
       loopDevices.style.display = "block";
     });
 
-    //Hovering Container
+    //Hovering Container 
     liContainer.addEventListener("mouseenter", function (event) {
       hideAllFilters();
       container.style.display = "block";
     });
 
-    //Hovering Uname
+    //Hovering Uname 
     liUname.addEventListener("mouseenter", function (event) {
       hideAllFilters();
       uname.style.display = "block";
     });
 
-    //Hovering Singularity
+    //Hovering Singularity 
     liSingularity.addEventListener("mouseenter", function (event) {
       hideAllFilters();
       singularity.style.display = "block";
+    });
+
+    //Hovering Singularity for Group
+    liSingularityGroup.addEventListener("mouseenter", function (event) {
+      hideAllFilters();
+      singularityGroup.style.display = "block";
     });
 
     //Hovering TMP
@@ -459,26 +595,54 @@
       }
     };
 
+    // When the user clicks on the button, open the modal
+    groupBtn.onclick = function () {
+      if (!showGroupByModal) {
+        groupModal.style.display = "block";
+        showGroupByModal = true;
+      } else {
+        hideAllFilters();
+        groupModal.style.display = "none";
+        showGroupByModal = false;
+      }
+    };
+
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function (event) {
       if (event.target != btn && event.target != modal) {
+        if(event.target != customParameterGroup){
+          hideAllFilters();
+          modal.style.display = "none";
+          showModal = false;
+        }
+      }
+      if (event.target != groupBtn && event.target != customParameterGroup && event.target != groupModal) {
         hideAllFilters();
-        modal.style.display = "none";
-        showModal = false;
+        groupModal.style.display = "none";
+        showGroupByModal = false;
       }
     };
 
     //function for hiding all list extensions
     function hideAllFilters() {
       customParameter.style.display = "none";
+      customGroup.style.display = "none";
       HMD.style.display = "none";
+      //HMDGroup.style.display = "none";
       loopDevices.style.display = "none";
+      //loopDevicesGroup.style.display = "none";
       container.style.display = "none";
+      //containerGroup.style.display = "none";
       uname.style.display = "none";
+      //unameGroup.style.display = "none";
       singularity.style.display = "none";
+      singularityGroup.style.display = "none";
       TMP.style.display = "none";
+      //TMPGroup.style.display = "none";
       underlay.style.display = "none";
+      //underlayGroup.style.display = "none";
       overlay.style.display = "none";
+      //overlayGroup.style.display = "none";
     }
 
 </script>

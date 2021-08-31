@@ -1,13 +1,5 @@
 <%@ page import="lia.Monitor.Store.Fast.DB,alimonitor.*,lazyj.*,java.util.*,java.io.*,java.text.SimpleDateFormat,lia.Monitor.Store.*,lia.web.utils.Formatare,lia.web.utils.DoubleFormat,lia.Monitor.monitor.*"%>
 
-<html>
-   <body>
-      Hello World!<br/>
-      <%
-         out.println("Your IP address is " + request.getRemoteAddr());
-      %>
-   </body>
-</html>
 <%
     lia.web.servlets.web.Utils.logRequest("START /sitesonar/index.jsp", 0, request);
 
@@ -25,7 +17,7 @@
     final RequestWrapper rw = new RequestWrapper(request); 
      
 
-    // -------------------
+    // ------------------- 
     // Sites drop-down
 
     String sSite = rw.gets("site");
@@ -102,27 +94,44 @@
 
     // Filters
     // Collect host_ids of tests that satisfy filter
-    //String[] filterCategory = {"test_name='singularity' AND test_message='SUPPORTED'"};
-    //int filters = filterCategory.length;
-    //String filterString = ""; 
+    String[] filterCategory = {"test_name='singularity' AND test_message='SUPPORTED'"};
+
+
+    String filterTestName = {"overlay"}
+    String filterTestMessage = {"enable overlay = no"}    
+    int filters = filterCategory.length;
+    String filterString = "";
 
 
     //Put filters together
-    /*for(int i = 0; i < filters; i++){
+    for(int i = 0; i < filters; i++){
         filterString += filterCategory[i] + "OR";
     }
     //Render filters
     for(int i = 0; i < filters; i++){
         filterElement.modify("filter_name", filterCategory[i]);
         p.append("filters", filterElement);
-    }*/
+    }
 
-    //TODO, make asynchronous
-    //final DB entireDB = new DB("SELECT host_id, test_name FROM sitesonar_tests WHERE " + filterCategory[0] + ";");
-    final DB entireDB = new DB("SELECT host_id, test_message, site_name FROM sitesonar_tests WHERE test_name='singularity';");
+
+    final DB entireDB;
+
+    //By default, grouping is set to singularity
+    if(request.getParameter("grouping") == "" || request.getParameter("grouping") == null){
+        entireDB = new DB("SELECT host_id, test_message, site_name FROM sitesonar_tests WHERE test_name='singularity';");
+    }
+    else{
+        entireDB = new DB("SELECT host_id, test_message, site_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "';");
+    }
+    
 
     // Group by
-    String grouping = "Support";
+    String g = "singularity";
+    String value = "SUPPORTED";
+    if(request.getParameter("value") != null){
+        value = request.getParameter("value");
+        g = request.getParameter("grouping");
+    }
 
     //test update
     //new DB("UPDATE sitesonar_tests SET site_name='' WHERE host_id = '1236838004' ;");
@@ -130,7 +139,7 @@
     
 
 
-
+    //Key: Site name, Value: count of supported groupings
     HashMap<String, Integer> countSupportForSites = new HashMap<String, Integer>();
     HashMap<String, Integer> countNotSupportForSites = new HashMap<String, Integer>();
     // Initialize hostIdsAndTests hashmap
@@ -151,7 +160,7 @@
         }
 
         //add value to already existing row
-        if(entireDB.gets(2).equals("SUPPORTED")){
+        if(entireDB.gets(2).equals(value)){
             countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))+1));
         }
         else{
@@ -190,25 +199,53 @@
             }
         }*/
 
-    //out.println("CERN:" + siteCEs.get("CERN")[0]);
-    //out.println("ISS:" + siteCEs.get("ISS")[0]);
+
     //Render list
     Page listHeaderSupport = new Page(null, "sitesonar/listHeader.res");
     Page listHeaderNotSupport = new Page(null, "sitesonar/listHeader.res");
-    listHeaderSupport.modify("header_name", grouping);
-    listHeaderNotSupport.modify("header_name", "Not supported");
+    Page listHeaderTotal = new Page(null, "sitesonar/listHeader.res");
+    listHeaderSupport.modify("header_name", value);
+    listHeaderNotSupport.modify("header_name", "CE's supported");
+    listHeaderTotal.modify("header_name", "Total");
     
     p.append("list_header", listHeaderSupport);
     p.append("list_header", listHeaderNotSupport);
+    p.append("list_header", listHeaderTotal);
     final DB listDB = new DB("SELECT host_id FROM sitesonar_tests");
 
+    int totalCEs = 0;
+    int totalSupportedCEs = 0;
+
     for(int i = 0; i < sites.size(); i++) {
+        //Calculates percentage of sites covered by grouping parameter
+
+        float percentSupport = 0;
+        int total = 0;
+
+        //This is to avoid nullpointer error.
+        if(countSupportForSites.get(sites.get(i)) != null && countNotSupportForSites.get(sites.get(i)) != null){
+            percentSupport = (countSupportForSites.get(sites.get(i)) * 100.0f) / (countSupportForSites.get(sites.get(i)) + countNotSupportForSites.get(sites.get(i)));
+            total = countSupportForSites.get(sites.get(i)) + countNotSupportForSites.get(sites.get(i));
+
+            //Summarize all CEs for all sites
+            totalCEs += total;
+            totalSupportedCEs += countSupportForSites.get(sites.get(i));
+        }
+
         listElement.modify("site_name", sites.get(i));
         listElement.modify("group_by", countSupportForSites.get(sites.get(i)));
-        listElement.modify("not_group_by", countNotSupportForSites.get(sites.get(i)));
+        listElement.modify("not_group_by", percentSupport + "%");
+        listElement.modify("total", total);
         p.append("testList", listElement);
     }
-    p.modify("n_sites", sites.size());
+
+
+    //TODO: change to total CE's
+    p.modify("n_sites", totalCEs);
+    float percentageTotal = (totalSupportedCEs * 100.0f) / (totalCEs);
+    p.modify("percentTotal", (int) percentageTotal);
+    p.modify("groupParam", g);
+    p.modify("valueParam", value);
 
     pMaster.append(p);
     
