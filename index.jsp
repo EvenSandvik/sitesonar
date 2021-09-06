@@ -84,9 +84,6 @@
 
     // -------------------
 
-    //TODO: should this logic be in the index.res script?? Because it needs the button clicks on the page
-	// List
-    HashMap<String, Integer> hostIdsAndTests = new HashMap<String, Integer>();
     
 	Page listElement = new Page(null, "sitesonar/sonar_list.res");
     Page filterElement = new Page(null, "sitesonar/filterItem.res");
@@ -94,34 +91,70 @@
 
     // Filters
     // Collect host_ids of tests that satisfy filter
-    String[] filterCategory = {"test_name='singularity' AND test_message='SUPPORTED'"};
 
-
-    String filterTestName = {"overlay"}
-    String filterTestMessage = {"enable overlay = no"}    
-    int filters = filterCategory.length;
+    //String[] filterTestName = {"overlay"};
+    int filterLength;
     String filterString = "";
+    //String[] filterTestName = new String[10];
+    //String[] filterTestMessage = new String[10];
+    List<String> filterTestName = new ArrayList<String>();
+    List<String> filterTestMessage = new ArrayList<String>();
 
-
-    //Put filters together
-    for(int i = 0; i < filters; i++){
-        filterString += filterCategory[i] + "OR";
+    //If there aren't filter parameters
+    if(request.getParameter("filterTestNames") == "" || request.getParameter("filterTestNames") == null){
+        filterLength = 0;
+        filterString = ";";
+        //filterTestName[0] = "";
+        //filterTestMessage[0] = "";
     }
-    //Render filters
-    for(int i = 0; i < filters; i++){
-        filterElement.modify("filter_name", filterCategory[i]);
-        p.append("filters", filterElement);
+    else{
+        filterTestName.add(request.getParameter("filterTestNames"));
+        //filterLength = filterTestName.length;
+        filterLength = filterTestName.size();
+
+        String filterTestMessageVal = "";
+        if(request.getParameter("filterTestMessages") != null){
+            filterTestMessageVal = request.getParameter("filterTestMessages");
+        }
+    
+
+        filterTestMessage.add(filterTestMessageVal); 
+        
+        //make filterstring for fetching tests
+        for(int i = 0; i < filterLength; i++){
+            filterString += "OR test_name='" + filterTestName.get(i) + "'";
+        }
+        filterString += ";";
+        //Render filters
+        for(int i = 0; i < filterLength; i++){
+            filterElement.modify("filter_name", filterTestName.get(i) + ": " + filterTestMessage.get(i));
+            p.append("filters", filterElement);
+        }
     }
 
 
     final DB entireDB;
 
-    //By default, grouping is set to singularity
+    //Fetch tests for grouping and filters
     if(request.getParameter("grouping") == "" || request.getParameter("grouping") == null){
-        entireDB = new DB("SELECT host_id, test_message, site_name FROM sitesonar_tests WHERE test_name='singularity';");
+        //By default, grouping is set to singularity
+        if(filterLength > 0){
+             entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity' " + filterString);
+             out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity' " + filterString);
+        }
+        else{
+            entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity';");
+        }
+        
     }
     else{
-        entireDB = new DB("SELECT host_id, test_message, site_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "';");
+        if(filterLength > 0){
+            entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "'" + filterString);
+        }
+        else{
+            entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "';");
+        }
+        
     }
     
 
@@ -142,74 +175,104 @@
     //Key: Site name, Value: count of supported groupings
     HashMap<String, Integer> countSupportForSites = new HashMap<String, Integer>();
     HashMap<String, Integer> countNotSupportForSites = new HashMap<String, Integer>();
-    // Initialize hostIdsAndTests hashmap
-    while(entireDB.moveNext()){
 
-        //Fill site_name field if empty. TODO: test comment out and speed increase
-        /*if(entireDB.gets(3) == "" || entireDB.gets(3) == null || entireDB.gets(3).length() == 0){
-            String key = entireDB.gets(1);
-            DB stringName = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id='" + key + "';");
-            new DB("UPDATE sitesonar_tests SET site_name='" + stringName.gets(1) + "' WHERE host_id = '" + key + "' ;");
-        }*/
+    //Hashmap for checking if all filters are ok for a host_id. Values explained below
+    //2: counted in countSupportForSites
+    //1: false if it was 2 remove -1 from countSupportForSites and add +1 to not support, 
+    //0: init
+    HashMap<String, Integer> filterSupportMap = new HashMap<String, Integer>();
+
+    //TODO, one with filters and one without. Save time on checking everyloop the filterlength
+    if(filterLength > 0){
+        // Iterate over sitesonar_tests
+        while(entireDB.moveNext()){
+
+            //Fill site_name field if empty. TODO: test comment out and speed increase
+            /*if(entireDB.gets(3) == "" || entireDB.gets(3) == null || entireDB.gets(3).length() == 0){
+                String key = entireDB.gets(1);
+                DB stringName = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id='" + key + "';");
+                new DB("UPDATE sitesonar_tests SET site_name='" + stringName.gets(1) + "' WHERE host_id = '" + key + "' ;");
+            }*/
 
 
-        ////////TODO: Create new branch. drop hashmap, just go straight to counting. Maybe hashmap with [sitename, countWhichSupportGrouping]
-        if(!countSupportForSites.containsKey(entireDB.gets(3))){
-            countSupportForSites.put(entireDB.gets(3), 0);
-            countNotSupportForSites.put(entireDB.gets(3), 0);
+            //init the hashmaps
+            if(!countSupportForSites.containsKey(entireDB.gets(3))){
+                countSupportForSites.put(entireDB.gets(3), 0);
+                countNotSupportForSites.put(entireDB.gets(3), 0);
+            }
+
+            if(!filterSupportMap.containsKey(entireDB.gets(1))){
+                filterSupportMap.put(entireDB.gets(1), 0);
+            }
+
+            //Filtering
+            for(int i = 0; i < filterLength; i++){
+                //If this test is being filtered, but value is wrong, put 1
+                if(entireDB.gets(4).equals(filterTestName.get(i)) && !entireDB.gets(2).equals(filterTestMessage.get(i))){
+                    
+                    //If was counted in support hashmap, remove it and add to notSupport hashmap
+                    if(filterSupportMap.get(entireDB.gets(1)) == 2){
+                        countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))-1));
+                        countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
+                    }
+
+                    filterSupportMap.put(entireDB.gets(1), 1);
+                }
+            }           
+
+            //If test_message is correct, add value to already existing row
+            if(entireDB.gets(2).equals(value) && filterSupportMap.get(entireDB.gets(1)) == 0){
+                countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))+1));
+                filterSupportMap.put(entireDB.gets(1), 2);
+            }
+            else{
+                countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
+            }
         }
+    }
+    else {
+        // Iterate over sitesonar_tests with no filters
+        while(entireDB.moveNext()){
 
-        //add value to already existing row
-        if(entireDB.gets(2).equals(value)){
-            countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))+1));
-        }
-        else{
-            countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
+            //Fill site_name field if empty. TODO: test comment out and speed increase
+            /*if(entireDB.gets(3) == "" || entireDB.gets(3) == null || entireDB.gets(3).length() == 0){
+                String key = entireDB.gets(1);
+                DB stringName = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id='" + key + "';");
+                new DB("UPDATE sitesonar_tests SET site_name='" + stringName.gets(1) + "' WHERE host_id = '" + key + "' ;");
+            }*/
+
+            if(!countSupportForSites.containsKey(entireDB.gets(3))){
+                countSupportForSites.put(entireDB.gets(3), 0);
+                countNotSupportForSites.put(entireDB.gets(3), 0);
+            }
+
+            //If test_message is correct, add value to already existing row
+            if(entireDB.gets(2).equals(value)){
+                countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))+1));
+            }
+            else{
+                countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
+            }
         }
     }
 
-    // TODO: Add tests to site.
-    //Loop over HashMap
-        /*for (String key : hostIdsAndTests.keySet()){
+    
 
-            //Get ce name for this 
-            //final DB ceNameDB = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id=" + key + ";");
-            String ceName = entireDB.gets(3);
-
-            //Check if it is supported or not according to grouping
-            final DB supportGrouping = new DB("SELECT test_message FROM sitesonar_tests WHERE host_id=" + key + " AND test_name='singularity';");
-            
-            //out.println(supportGrouping.gets(1));
-
-
-            //TODO: bug here. It adds one to all arrays
-            //For singularity
-            if(supportGrouping.gets(1).equals("SUPPORTED")){
-                //out.println(ceName);
-                int[] ceArray = siteCEs.get(ceName);
-                ceArray[0] += 1;
-                siteCEs.put(ceName, ceArray);
-                //out.println(ceName + ": " + siteCEs.get(ceName)[0]);
-            }
-            else{
-                //out.println(ceName);
-                int[] ceArray = siteCEs.get(ceName);
-                ceArray[1] += 1;
-                siteCEs.put(ceName, ceArray);
-            }
-        }*/
-
-
+    //token: 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
     //Render list
     Page listHeaderSupport = new Page(null, "sitesonar/listHeader.res");
-    Page listHeaderNotSupport = new Page(null, "sitesonar/listHeader.res");
+    Page listHeaderPercent = new Page(null, "sitesonar/listHeader.res");
+    Page listHeaderOther = new Page(null, "sitesonar/listHeader.res");
     Page listHeaderTotal = new Page(null, "sitesonar/listHeader.res");
+    
     listHeaderSupport.modify("header_name", value);
-    listHeaderNotSupport.modify("header_name", "CE's supported");
+    listHeaderOther.modify("header_name", "Other nodes");
+    listHeaderPercent.modify("header_name", "Nodes supported");
     listHeaderTotal.modify("header_name", "Total");
     
     p.append("list_header", listHeaderSupport);
-    p.append("list_header", listHeaderNotSupport);
+    p.append("list_header", listHeaderOther);
+    p.append("list_header", listHeaderPercent);
     p.append("list_header", listHeaderTotal);
     final DB listDB = new DB("SELECT host_id FROM sitesonar_tests");
 
@@ -234,6 +297,7 @@
 
         listElement.modify("site_name", sites.get(i));
         listElement.modify("group_by", countSupportForSites.get(sites.get(i)));
+        listElement.modify("other_nodes", countNotSupportForSites.get(sites.get(i)));
         listElement.modify("not_group_by", percentSupport + "%");
         listElement.modify("total", total);
         p.append("testList", listElement);
@@ -246,7 +310,13 @@
     p.modify("percentTotal", (int) percentageTotal);
     p.modify("groupParam", g);
     p.modify("valueParam", value);
-
+    
+    if(request.getParameter("filterTestNames") != null){
+        p.modify("filterParam", request.getParameter("filterTestNames") + ": ");
+    }
+    if(request.getParameter("filterTestMessages") != null){
+        p.modify("filterValueParam", request.getParameter("filterTestMessages"));
+    }
     pMaster.append(p);
     
     pMaster.write();
@@ -254,50 +324,6 @@
     out.println(new String(baos.toByteArray()));
     
     lia.web.servlets.web.Utils.logRequest("/siteinfo/index.jsp?site="+sSite, baos.size(), request);
-
-
-
-//Very slow sql query for counting sites.
-//SELECT COUNT (test.host_id) FROM sitesonar_tests AS test, sitesonar_hosts AS host WHERE ce_name='CERN';
-
-    /*
- home
- container_enabled.sh
- cpu_info.sh
- cvmfs_version.sh
- singularity
- os
- overlay
- cpu_info
- isolcpus_checking
- cpuset_checking
- wlcg_metapackage
- tmp
- uname
- cvmfs_version
- running_container
- underlay
- gcc_version
- cgroups2_checking
- overlay.sh
- ram_info
- lhcbmarks
- gcc_version.sh
- home.sh
- lhcbmarks.sh
- loop_devices.sh
- lsb_release.sh
- max_namespaces.sh
- os.sh
- ram_info.sh
- cpulimit_checking
- lsb_release
- loop_devices
- get_jdl_cores
- taskset_other_processes
- max_namespaces
- taskset_own_process
-    */
 %>
 
 <%!
