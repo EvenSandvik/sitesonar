@@ -84,6 +84,7 @@
    overflow: auto;
    box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
    margin-right: 0.5rem;
+   border-radius: 0.3rem;
    }
    .filter-category {
    padding: 0.25rem 0.5rem;
@@ -125,6 +126,7 @@
    max-width: 20rem;
    height: fit-content;
    box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
+   border-radius: 0.3rem;
    }
    .pageButton {
    border: none;
@@ -140,10 +142,13 @@
          <img src="http://pngimg.com/uploads/share/share_PNG52.png" alt="" style="height:15px; padding: 0 2px 4px 0;"></img>
          <p style="color:#646464;margin:0;">Share</p>
       </button>
+      <div style="position: absolute;top: 1.5rem;border-radius: 0.5rem;right: 0;border: 1px solid #DDD;padding: 0.8rem 1rem;">Link: <input id="shareLinkElement" type="text" readonly style="width: 11rem;"/></div>
    </div>
    <div style="text-align: justify">
+
       <div id="contentwrapper" align=center" style="padding-bottom:30px, padding-left: 30px">
          <p style="margin:4px 0 2px 0; border-bottom: 1px solid #9B9B9B;"><button id="sitesBtn" class="pageButton" style="border-bottom: 3px solid #478BF2;">Sites</button><button id="nodesBtn" class="pageButton">All nodes</button></p>
+         
          <div id="sitesPage" style="position:relative">
             <h3 style="margin:4px 0 2px 0;">Filter Sites</h3>
             <p style="color:#929292; font-size:12px;margin:0">Filter out results from fetched grid sites</p>
@@ -181,7 +186,7 @@
             <br></br>
             <div id="filterButtonWrapper">
                <button id="myBtn" class="addfilter-button">Filter</button>
-               <div style="display: flex; width: -moz-fit-content;">
+               <div style="display: flex; width: -moz-fit-content;position: absolute;background-color: #FFF;">
                   <div id="filterModal" class="dropdown-modal">
                      <ul class="filter-list">
                         <li id="liCustom" class="filter-category">Custom Parameter</li>
@@ -260,9 +265,9 @@
                </p>
             </div>
             <br></br>
-            <div id="groupByID">
+            <div id="groupButtonWrapper">
                <button id="groupBtn" class="addfilter-button">Group by</button>
-               <div style="display: flex">
+               <div style="display: flex;position: absolute;background-color: #FFF;">
                   <div id="groupModal" class="dropdown-modal">
                      <ul class="filter-list">
                         <li id="liCustomGroup" class="filter-category">Custom Parameter</li>
@@ -317,7 +322,8 @@
             <<:result_count:>> results
          </p>
       </div>
-      <div id="AllNodesPage" style=-"display: none;">
+
+      <div id="AllNodesPage" style="display: none;">
          <<:siteId:>>
       </div>
    </div>
@@ -332,6 +338,7 @@
    var filterArrayParam = "";
    
    var filterValueParam = "";
+
    
    function setParameters(group, val){
      groupingParam = group;
@@ -368,10 +375,10 @@
    //TODO: edit to make it possible for multiple parameters
    //add parameters to url when clicking apply
    function replace_search(name) {
-     var url = location.search;
-     if (new RegExp("[&?]"+name+"([=&].+)?$").test(url)) {
+     var url = "";
+     /*if (new RegExp("[&?]"+name+"([=&].+)?$").test(url)) {
            url = url.replace(new RegExp("(?:[&?])"+name+"[^&]*", "g"), "")
-       }
+       }*/
    
      if(groupingParam != ""){
        //Add grouping parameter
@@ -436,6 +443,9 @@
    var sitesPage = document.getElementById("sitesPage");
    
    var nodesPage = document.getElementById("AllNodesPage");
+
+   var shareLinkElement = document.getElementById("shareLinkElement");
+   shareLinkElement.value = location.origin + location.pathname  + location.search;
    
    groupingParamBox = document.getElementById("customGroupParameter");
    valueParamBox = document.getElementById("customValueParameter");
@@ -446,17 +456,16 @@
      sitesPage.style.display = "block";
      nodesPage.style.display = "none";
    
-     sitesButton.style.borderBottom = "3px solid ##478BF2";
-     nodesPage.style.borderBottom = "none";
+     nodesButton.style.borderBottom = "none";
+     sitesButton.style.borderBottom = "3px solid #478BF2";
    };
    
    nodesButton.onclick = function () {
-     console.log("clicked All nodes button");
      sitesPage.style.display = "none";
      nodesPage.style.display = "block";
    
      sitesButton.style.borderBottom = "none";
-     nodesPage.style.borderBottom = "3px solid ##478BF2";
+     nodesButton.style.borderBottom = "3px solid #478BF2";
    };
    
    var showModal = false;
@@ -614,55 +623,57 @@
      }
    };
    
-   // When the user clicks anywhere outside of the modal, close it
-   /*
-   //window.onclick = function (event) {
-     if (event.target != btn && event.target != modal) {
-       if(event.target != groupBtn && event.target != customParameterGroup && event.target != groupingParamBox && event.target != valueParamBox && event.target != groupModal){
-         hideAllFilters();
-         modal.style.display = "none";
-         showModal = false;
-         groupModal.style.display = "none";
-         showGroupByModal = false;
-       }
-     }
-   };
-   */
-   
    var filterModalWrapper = document.getElementById('filterButtonWrapper');
    document.addEventListener('click', function( event ) {
      if (filterModalWrapper !== event.target && !filterModalWrapper.contains(event.target)) {    
-       console.log('clicking outside the div');
+       console.log('clicking outside filter div');
        hideAllFilters();
-       hideModals();
+       hideFilterModal();
+     }
+   });
+
+   var groupButtonWrapper = document.getElementById('groupButtonWrapper');
+   document.addEventListener('click', function( event ) {
+     if (groupButtonWrapper !== event.target && !groupButtonWrapper.contains(event.target)) {    
+       console.log('clicking outside group div');
+       hideAllGroupings();
+       hideGroupModal();
      }
    });
    
-   function hideModals(){
+   function hideFilterModal(){
      showModal = false;
-     showGroupByModal = false;
      modal.style.display = "none";
+   }
+
+   function hideGroupModal(){
+     showGroupByModal = false;
      groupModal.style.display = "none";
    }
-   //function for hiding all list extensions
+
+   //function for hiding all list extensions for filter button
    function hideAllFilters() {
      customParameter.style.display = "none";
-     customGroup.style.display = "none";
      HMD.style.display = "none";
-     //HMDGroup.style.display = "none";
      loopDevices.style.display = "none";
-     //loopDevicesGroup.style.display = "none";
      container.style.display = "none";
-     //containerGroup.style.display = "none";
      uname.style.display = "none";
-     //unameGroup.style.display = "none";
      singularity.style.display = "none";
      singularityGroup.style.display = "none";
      TMP.style.display = "none";
-     //TMPGroup.style.display = "none";
      underlay.style.display = "none";
-     //underlayGroup.style.display = "none";
      overlay.style.display = "none";
+   }
+
+   //function for hiding all list extensions
+   function hideAllGroupings() {
+     customGroup.style.display = "none";
+     //HMDGroup.style.display = "none";
+     //loopDevicesGroup.style.display = "none";
+     //containerGroup.style.display = "none";
+     //unameGroup.style.display = "none";
+     //TMPGroup.style.display = "none";
+     //underlayGroup.style.display = "none";
      //overlayGroup.style.display = "none";
    }
    
