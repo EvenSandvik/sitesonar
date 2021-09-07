@@ -1,6 +1,10 @@
 <%@ page import="lia.Monitor.Store.Fast.DB,alimonitor.*,lazyj.*,java.util.*,java.io.*,java.text.SimpleDateFormat,lia.Monitor.Store.*,lia.web.utils.Formatare,lia.web.utils.DoubleFormat,lia.Monitor.monitor.*"%>
 
 <%
+
+//index created with: CREATE INDEX test_name_index on sitesonar_tests(test_name);
+
+//EXPLAIN ANALYZE SELECT * FROM sitesonar_tests WHERE site_name='CERN' AND test_name='singularity' AND test_message='SUPPORTED';  
     lia.web.servlets.web.Utils.logRequest("START /sitesonar/index.jsp", 0, request);
 
     final ServletContext sc = getServletContext();
@@ -122,7 +126,7 @@
         
         //make filterstring for fetching tests
         for(int i = 0; i < filterLength; i++){
-            filterString += "OR test_name='" + filterTestName.get(i) + "'";
+            filterString += " OR (test_name='" + filterTestName.get(i) + "' AND test_message='" + filterTestMessage.get(i) + "')";
         }
         filterString += ";";
         //Render filters
@@ -144,15 +148,18 @@
         }
         else{
             entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity';");
+            out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity';");
         }
         
     }
     else{
         if(filterLength > 0){
             entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "'" + filterString);
+            out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "'" + filterString);
         }
         else{
             entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "';");
+            out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "';");
         }
         
     }
@@ -187,14 +194,6 @@
         // Iterate over sitesonar_tests
         while(entireDB.moveNext()){
 
-            //Fill site_name field if empty. TODO: test comment out and speed increase
-            /*if(entireDB.gets(3) == "" || entireDB.gets(3) == null || entireDB.gets(3).length() == 0){
-                String key = entireDB.gets(1);
-                DB stringName = new DB("SELECT ce_name FROM sitesonar_hosts WHERE host_id='" + key + "';");
-                new DB("UPDATE sitesonar_tests SET site_name='" + stringName.gets(1) + "' WHERE host_id = '" + key + "' ;");
-            }*/
-
-
             //init the hashmaps
             if(!countSupportForSites.containsKey(entireDB.gets(3))){
                 countSupportForSites.put(entireDB.gets(3), 0);
@@ -205,29 +204,39 @@
                 filterSupportMap.put(entireDB.gets(1), 0);
             }
 
-            //Filtering
-            for(int i = 0; i < filterLength; i++){
-                //If this test is being filtered, but value is wrong, put 1
-                if(entireDB.gets(4).equals(filterTestName.get(i)) && !entireDB.gets(2).equals(filterTestMessage.get(i))){
-                    
-                    //If was counted in support hashmap, remove it and add to notSupport hashmap
-                    if(filterSupportMap.get(entireDB.gets(1)) == 2){
-                        countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))-1));
-                        countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
-                    }
-
-                    filterSupportMap.put(entireDB.gets(1), 1);
-                }
-            }           
-
-            //If test_message is correct, add value to already existing row
+            //If test_message is correct and not hostid not visited, add value to already existing row
             if(entireDB.gets(2).equals(value) && filterSupportMap.get(entireDB.gets(1)) == 0){
+                //Count match with value
                 countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))+1));
+
+                //Set hostid to visited
                 filterSupportMap.put(entireDB.gets(1), 2);
             }
-            else{
+            else if(filterSupportMap.get(entireDB.gets(1)) == 0){
+                //Count not matching with value
                 countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
+                
+                //set hostid to visiteds
+                filterSupportMap.put(entireDB.gets(1), 3);
             }
+
+            //host_id, test_message, site_name, test_name
+            
+            //Filtering
+            //If testname equals filter testname, and message not equals filter message
+            if(entireDB.gets(4).equals(filterTestName.get(0)) && !entireDB.gets(2).equals(filterTestMessage.get(0))){
+                    
+                //If was counted in support hashmap, remove it and add to notSupport hashmap
+                if(filterSupportMap.get(entireDB.gets(1)) == 2){
+                    //Remove one count, because its filtered out
+                    countSupportForSites.put(entireDB.gets(3), (countSupportForSites.get(entireDB.gets(3))-1));
+
+
+                    countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
+                }
+
+                filterSupportMap.put(entireDB.gets(1), 1);
+            }  
         }
     }
     else {
@@ -254,9 +263,7 @@
                 countNotSupportForSites.put(entireDB.gets(3), (countNotSupportForSites.get(entireDB.gets(3))+1));
             }
         }
-    }
-
-    
+    }  
 
     //token: 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
     //Render list

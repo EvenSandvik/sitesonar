@@ -108,7 +108,7 @@
    padding: 0.5rem 1rem;
    color: #727272;
    margin-bottom: 1rem;
-   width: 7rem;
+   width: 9rem;
    }
    .addfilter-button:hover {
    transition: 200ms;
@@ -121,10 +121,12 @@
    color: #d8d8d8;
    }
    .filter-selected-menu {
+   width: min-content;
    display: none;
    min-width: 11rem;
    max-width: 20rem;
    height: fit-content;
+   height: min-content;
    box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
    border-radius: 0.3rem;
    }
@@ -134,15 +136,51 @@
    font-size: 1rem;
    margin-right: 1rem;
    }
+
+   .cancelButton{
+      padding: 0.5rem 0.7rem;
+      border-radius: 3rem;
+      border: none;
+      margin: 1rem 1rem 0 0;
+   }
+   .cancelButton:hover{
+      transition: 100ms;
+      background-color: #f5f5f5;;
+   }
+   .cancelButton:active{
+      transition: 100ms;
+      background-color: #f5f5f5;
+      color: #d8d8d8;
+   }
+
+   .submitButton{
+      color: #FFF;
+      float: right;
+      border-radius: 3rem;
+      padding: 0.5rem 0.7rem;
+      border: none;
+      margin: 1rem 1rem 0 0;
+      background-color: #4798F9;
+   }
+   .submitButton:hover{
+      transition: 100ms;
+      background-color: #94BBEA;
+   }
+   .submitButton:active{
+      transition: 100ms;
+      background-color: #94BBEA;
+      color: #d8d8d8;
+   }
+   
 </style>
 <div style="font-family:Verdana,Helvetica,Arial,sans-serif;">
    <div style="display:flex; position:relative">
       <h3 style="color:#898989">WLCG Configuration Monitoring Tool</h3>
-      <button style="position:absolute; top:0; right:0; display:flex; align-items: center; height:fit-content; width:fit-content;border:none;background:none;">
+      <button onClick="toggleShareButton()" id="shareBtn" style="position:absolute; top:0; right:0; display:flex; align-items: center; height:fit-content; width:fit-content;border:none;background:none;">
          <img src="http://pngimg.com/uploads/share/share_PNG52.png" alt="" style="height:15px; padding: 0 2px 4px 0;"></img>
          <p style="color:#646464;margin:0;">Share</p>
       </button>
-      <div style="position: absolute;top: 1.5rem;border-radius: 0.5rem;right: 0;border: 1px solid #DDD;padding: 0.8rem 1rem;">Link: <input id="shareLinkElement" type="text" readonly style="width: 11rem;"/></div>
+      <div id="shareModal" style="position: absolute;top: 1.5rem;border-radius: 0.5rem;right: 0;border: 1px solid #DDD;padding: 0.8rem 1rem;display: none;">Link: <input id="shareLinkElement" type="text" readonly style="width: 11rem;"/></div>
    </div>
    <div style="text-align: justify">
 
@@ -150,7 +188,7 @@
          <p style="margin:4px 0 2px 0; border-bottom: 1px solid #9B9B9B;"><button id="sitesBtn" class="pageButton" style="border-bottom: 3px solid #478BF2;">Sites</button><button id="nodesBtn" class="pageButton">All nodes</button></p>
          
          <div id="sitesPage" style="position:relative">
-            <h3 style="margin:4px 0 2px 0;">Filter Sites</h3>
+            <h3 style="margin:1rem 0 0.5rem 0;">Filter Sites</h3>
             <p style="color:#929292; font-size:12px;margin:0">Filter out results from fetched grid sites</p>
             <div style="position:absolute; right:0; top: 0; display:flex;">
                <div style="margin-right:1rem">
@@ -184,7 +222,7 @@
                </div>
             </div>
             <br></br>
-            <div id="filterButtonWrapper">
+            <div id="filterButtonWrapper" style="display: contents;">
                <button id="myBtn" class="addfilter-button">Filter</button>
                <div style="display: flex; width: -moz-fit-content;position: absolute;background-color: #FFF;">
                   <div id="filterModal" class="dropdown-modal">
@@ -203,12 +241,13 @@
                      </ul>
                   </div>
                   <!-- All menus -->
-                  <div id="custom" class="filter-selected-menu">
-                     <p>Test name</p>
+                  <div id="custom" class="filter-selected-menu" style="padding: 1rem;">
+                     <p style="margin: 0;font-size: 0.8rem;color: #555;">Name</p>
                      <input id="customFilterParameter" type="text" />
-                     <p>Test value</p>
+                     <p style="margin: 0;font-size: 0.8rem;color: #555;margin-top: 1rem;">Value</p>
                      <input id="customFilterValueParameter" type="text" />
-                     <button onClick="customFiltering()">Submit</button>
+                     <button onClick="cancel()" class="cancelButton">Cancel</button>
+                     <button onClick="customFiltering()" class="submitButton">Submit</button>
                   </div>
                   <div id="HMD" class="filter-selected-menu">
                      <ul class="filter-list">
@@ -265,8 +304,8 @@
                </p>
             </div>
             <br></br>
-            <div id="groupButtonWrapper">
-               <button id="groupBtn" class="addfilter-button">Group by</button>
+            <div id="groupButtonWrapper" style="display: contents;">
+               <button id="groupBtn" class="addfilter-button">Add grouping +</button>
                <div style="display: flex;position: absolute;background-color: #FFF;">
                   <div id="groupModal" class="dropdown-modal">
                      <ul class="filter-list">
@@ -284,12 +323,13 @@
                      </ul>
                   </div>
                   <!-- All menus -->
-                  <div id="customGroup" class="filter-selected-menu">
-                     <p>Test name</p>
+                  <div id="customGroup" class="filter-selected-menu" style="padding: 1rem;">
+                     <p style="margin: 0;font-size: 0.8rem;color: #555;">Name</p>
                      <input id="customGroupParameter" type="text" />
-                     <p>Test value</p>
+                     <p style="margin: 0;font-size: 0.8rem;color: #555;margin-top: 1rem;">Value</p>
                      <input id="customValueParameter" type="text" />
-                     <button onClick="customGrouping()" style="border: none; position: absolute;right: 0;color: #5188CA;padding: 0.5rem 1rem; ">Submit</button>
+                     <button onClick="cancel()"  class="cancelButton">Cancel</button>
+                     <button onClick="customGrouping()" class="submitButton">Add</button>
                   </div>
                   <br></br>
                   <div id="singularityGroup" class="filter-selected-menu">
@@ -301,7 +341,7 @@
                   </div>
                </div>
             </div>
-            <div style="background-color: #EFEFEF; border-radius: 10rem; display: inline-block; padding: 0.5rem 1rem;">
+            <div style="background-color: #EFEFEF; border-radius: 10rem; display: table; padding: 0.5rem 1rem;">
                <p id="groupingText" style="margin: 0; font-size: 0.7rem; color: #444;">
                   <<:groupParam:>>: <<:valueParam:>>
                </p>
@@ -311,7 +351,7 @@
                </div> -->
             <button onclick="replace_search('grouping')" class="addfilter-button" style="position:absolute;right: 0; color: #5188CA;padding: 0.5rem 1rem;">Apply</button>
             <table style="width:100%; margin-top:3rem; border-spacing: 0;">
-               <tr style="background-color: #c7daff;">
+               <tr style="background-color: #c7daff;text-align: left;">
                   <th class="list-element" style="font-weight: bold; ">Site Name</th>
                   <<:list_header:>>
                </tr>
@@ -331,13 +371,13 @@
 <script type="text/javascript">
    //TODO: get this values from the jsp
    //Set these values
-   var groupingParam = "";
+   var groupingParam = "<<:groupParam:>>";
    
-   var valueParam = "";
+   var valueParam = "<<:valueParam:>>";
    
-   var filterArrayParam = "";
+   var filterArrayParam = "<<:filterParam:>>";
    
-   var filterValueParam = "";
+   var filterValueParam = "<<:filterValueParam:>>";
 
    
    function setParameters(group, val){
@@ -363,12 +403,14 @@
      groupingParam = document.getElementById("customGroupParameter").value;
      valueParam = document.getElementById("customValueParameter").value;
      changeGroupText();
+     cancel();
    }
    
    function customFiltering() {
      filterArrayParam = document.getElementById("customFilterParameter").value;
      filterValueParam = document.getElementById("customFilterValueParameter").value;
      changeFilterText();
+     cancel();
    }
    
    
@@ -401,6 +443,12 @@
      }
      else{
        //Must have grouping
+       if(filterArrayParam != ""){
+         url += "?filterTestNames=" + filterArrayParam;
+         if(filterValueParam != ""){
+           url += "&filterTestMessages=" + filterValueParam;
+         }
+       }
    
      }
        // there is an official order for the query and the hash
@@ -676,6 +724,38 @@
      //underlayGroup.style.display = "none";
      //overlayGroup.style.display = "none";
    }
+
+   function cancel(){
+      hideFilterModal();
+      hideGroupModal();
+      hideAllFilters();
+      hideAllGroupings();
+   }
+
+   //Share button functions
+
+   var shareBtn = document.getElementById("shareBtn");
+   var shareModal = document.getElementById("shareModal");
+   var showShareModal = false;
+
+   function toggleShareButton(){
+      showShareModal = !showShareModal;
+      if(showShareModal){
+         shareModal.style.display = "block";
+      }
+      else{
+         shareModal.style.display = "none";
+      }
+   }
+
+   document.addEventListener('click', function( event ) {
+     if (shareModal !== event.target && shareBtn !== event.target && !shareBtn.contains(event.target) && !shareModal.contains(event.target)) {    
+       console.log('clicking outside share div');
+       showShareModal = false;
+       shareModal.style.display = "none";
+     }
+   });
+
    
 </script>
 
