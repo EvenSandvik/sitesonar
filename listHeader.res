@@ -1,0 +1,1 @@
+<th class="list-element" style="font-weight: normal;"><<:header_name:>></th>

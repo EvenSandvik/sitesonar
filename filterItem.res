@@ -1,0 +1,1 @@
+<div style="display: flex; margin-right: 0.5rem; align-items: center;"><p> <<:filter_name:>> </p> <button style="border: none; background: #ebebeb; outline: none; font-size: 0.8rem; font-weight: bold; border-radius: 2rem; width: 2rem; height: 2rem"><img src="./sitesonar/cross_icon.png" alt=""> x </img></button></div>
