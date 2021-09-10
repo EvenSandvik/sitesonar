@@ -1,178 +1,5 @@
+<!-- HTML and js functions for the Site Sonar web interface -->
 
-
-<style type="text/css">
-   //percentage circle
-   .flex-wrapper {
-   display: flex;
-   flex-flow: row nowrap;
-   width: 5rem;
-   }
-   .single-chart {
-   width: 100%;
-   justify-content: space-around ;
-   }
-   .circular-chart {
-   display: block;
-   margin: 0 auto;
-   max-width: 80%;
-   max-height: 250px;
-   }
-   .circle-bg {
-   fill: none;
-   stroke: #eee;
-   stroke-width: 3.8;
-   }
-   .circle {
-   fill: none;
-   stroke-width: 2.8;
-   stroke-linecap: round;
-   animation: progress 1s ease-out forwards;
-   }
-   @keyframes progress {
-   0% {
-   stroke-dasharray: 0 100;
-   }
-   }
-   .circular-chart.orange .circle {
-   stroke: #ff9f00;
-   }
-   .circular-chart.green .circle {
-   stroke: #4CC790;
-   }
-   .circular-chart.blue .circle {
-   stroke: #3c9ee5;
-   }
-   .percentage {
-   fill: #666;
-   font-family: sans-serif;
-   font-size: 0.5em;
-   text-anchor: middle;
-   }
-   //circle end
-   .sonar-title{
-   font-family: Verdana,Arial,Helvetica,sans-serif;
-   font-size: 12px;
-   font-weight: bold;
-   color: #000000;
-   text-decoration: none;
-   }
-   .list-element{
-   padding: 0.75rem;
-   }
-   .filter-button{
-   background-color: #EBEBEB;
-   color: #757575;
-   border: none;
-   font-size: 1rem;
-   border-radius: 0.4rem;
-   display: flex;
-   outline: none;
-   }
-   .filter-button:hover{
-   transition: 0.25s;
-   background-color: #F8F8F8;
-   color: #939393;
-   }
-   /*CSS for add filter button elements*/
-   .dropdown-modal {
-   display: none;
-   z-index: 1;
-   left: 2rem;
-   top: 0rem;
-   width: fit-content;
-   height: fit-content;
-   overflow: auto;
-   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
-   margin-right: 0.5rem;
-   border-radius: 0.3rem;
-   }
-   .filter-category {
-   padding: 0.25rem 0.5rem;
-   font-size: 1rem;
-   margin: 0;
-   min-width: 8rem;
-   height: 1rem;
-   }
-   .filter-category:hover {
-   background-color: rgb(240, 240, 240);
-   }
-   .filter-list {
-   list-style-type: none;
-   padding: 0;
-   margin: 0;
-   }
-   .addfilter-button {
-   background: #ebebeb;
-   border-radius: 6px;
-   border: none;
-   padding: 0.5rem 1rem;
-   color: #727272;
-   margin-bottom: 1rem;
-   width: 9rem;
-   }
-   .addfilter-button:hover {
-   transition: 200ms;
-   background: #f5f5f5;
-   color: #9c9c9c;
-   }
-   .addfilter-button:active {
-   transition: 100ms;
-   background: #f5f5f5;
-   color: #d8d8d8;
-   }
-   .filter-selected-menu {
-   width: min-content;
-   display: none;
-   min-width: 11rem;
-   max-width: 20rem;
-   height: fit-content;
-   height: min-content;
-   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
-   border-radius: 0.3rem;
-   }
-   .pageButton {
-   border: none;
-   background: none;
-   font-size: 1rem;
-   margin-right: 1rem;
-   }
-
-   .cancelButton{
-      padding: 0.5rem 0.7rem;
-      border-radius: 3rem;
-      border: none;
-      margin: 1rem 1rem 0 0;
-   }
-   .cancelButton:hover{
-      transition: 100ms;
-      background-color: #f5f5f5;;
-   }
-   .cancelButton:active{
-      transition: 100ms;
-      background-color: #f5f5f5;
-      color: #d8d8d8;
-   }
-
-   .submitButton{
-      color: #FFF;
-      float: right;
-      border-radius: 3rem;
-      padding: 0.5rem 0.7rem;
-      border: none;
-      margin: 1rem 1rem 0 0;
-      background-color: #4798F9;
-   }
-   .submitButton:hover{
-      transition: 100ms;
-      background-color: #94BBEA;
-   }
-   .submitButton:active{
-      transition: 100ms;
-      background-color: #94BBEA;
-      color: #d8d8d8;
-   }
-   
-</style>
 <div style="font-family:Verdana,Helvetica,Arial,sans-serif;">
    <div style="display:flex; position:relative">
       <h3 style="color:#898989">WLCG Configuration Monitoring Tool</h3>
@@ -183,10 +10,8 @@
       <div id="shareModal" style="position: absolute;top: 1.5rem;border-radius: 0.5rem;right: 0;border: 1px solid #DDD;padding: 0.8rem 1rem;display: none;">Link: <input id="shareLinkElement" type="text" readonly style="width: 11rem;"/></div>
    </div>
    <div style="text-align: justify">
-
       <div id="contentwrapper" align=center" style="padding-bottom:30px, padding-left: 30px">
          <p style="margin:4px 0 2px 0; border-bottom: 1px solid #9B9B9B;"><button id="sitesBtn" class="pageButton" style="border-bottom: 3px solid #478BF2;">Sites</button><button id="nodesBtn" class="pageButton">All nodes</button></p>
-         
          <div id="sitesPage" style="position:relative">
             <h3 style="margin:1rem 0 0.5rem 0;">Filter Sites</h3>
             <p style="color:#929292; font-size:12px;margin:0">Filter out results from fetched grid sites</p>
@@ -223,7 +48,7 @@
             </div>
             <br></br>
             <div id="filterButtonWrapper" style="display: contents;">
-               <button id="myBtn" class="addfilter-button">Filter</button>
+               <button id="filterBtn" class="addfilter-button">Filter</button>
                <div style="display: flex; width: -moz-fit-content;position: absolute;background-color: #FFF;">
                   <div id="filterModal" class="dropdown-modal">
                      <ul class="filter-list">
@@ -362,14 +187,13 @@
             <<:result_count:>> results
          </p>
       </div>
-
       <div id="AllNodesPage" style="display: none;">
          <<:siteId:>>
       </div>
    </div>
 </div>
 <script type="text/javascript">
-   //TODO: get this values from the jsp
+
    //Set these values
    var groupingParam = "<<:groupParam:>>";
    
@@ -378,7 +202,7 @@
    var filterArrayParam = "<<:filterParam:>>";
    
    var filterValueParam = "<<:filterValueParam:>>";
-
+   
    
    function setParameters(group, val){
      groupingParam = group;
@@ -414,7 +238,6 @@
    }
    
    
-   //TODO: edit to make it possible for multiple parameters
    //add parameters to url when clicking apply
    function replace_search(name) {
      var url = "";
@@ -491,14 +314,13 @@
    var sitesPage = document.getElementById("sitesPage");
    
    var nodesPage = document.getElementById("AllNodesPage");
-
+   
    var shareLinkElement = document.getElementById("shareLinkElement");
    shareLinkElement.value = location.origin + location.pathname  + location.search;
    
    groupingParamBox = document.getElementById("customGroupParameter");
    valueParamBox = document.getElementById("customValueParameter");
    
-   //TODO: Create groupby custom parameter
    
    sitesButton.onclick = function () {
      sitesPage.style.display = "block";
@@ -526,60 +348,49 @@
    var groupModal = document.getElementById("groupModal");
    
    // Get the button that opens the modal
-   var btn = document.getElementById("myBtn");
+   var filterButton = document.getElementById("filterBtn");
    
    // get group by button
    var groupBtn = document.getElementById("groupBtn");
    
-   //Get custom parameter list item
+   //Get custom parameter list items
    var liCustom = document.getElementById("liCustom");
    var liCustomGroup = document.getElementById("liCustomGroup");
-   
    var customParameter = document.getElementById("custom");
    var customParameterGroup = document.getElementById("customGroup");
    
    //Get HMD list item
    var liHMD = document.getElementById("liHMD");
-   
    var HMD = document.getElementById("HMD");
    
    //loop devices
    var liLoopDevices = document.getElementById("liLoop");
-   
    var loopDevices = document.getElementById("loopDevices");
    
    //Container
    var liContainer = document.getElementById("liContainer");
-   
    var container = document.getElementById("containerEnabled");
    
    //uname
    var liUname = document.getElementById("liUname");
-   
    var uname = document.getElementById("uname");
    
    //Singularity
    var liSingularity = document.getElementById("liSingularity");
-   
    var singularity = document.getElementById("singularity");
-   
    var liSingularityGroup = document.getElementById("liSingularityGroup");
-   
    var singularityGroup = document.getElementById("singularityGroup");
    
    //TMP
    var liTMP = document.getElementById("liTMP");
-   
    var TMP = document.getElementById("TMP");
    
    //Underlay
    var liUnderlay = document.getElementById("liUnderlay");
-   
    var underlay = document.getElementById("underlay");
    
    //Overlay
    var liOverlay = document.getElementById("liOverlay");
-   
    var overlay = document.getElementById("overlay");
    
    //Hovering custom
@@ -648,7 +459,7 @@
    });
    
    // When the user clicks on the button, open the modal
-   btn.onclick = function () {
+   filterButton.onclick = function () {
      if (!showModal) {
        modal.style.display = "block";
        showModal = true;
@@ -679,7 +490,7 @@
        hideFilterModal();
      }
    });
-
+   
    var groupButtonWrapper = document.getElementById('groupButtonWrapper');
    document.addEventListener('click', function( event ) {
      if (groupButtonWrapper !== event.target && !groupButtonWrapper.contains(event.target)) {    
@@ -693,12 +504,12 @@
      showModal = false;
      modal.style.display = "none";
    }
-
+   
    function hideGroupModal(){
      showGroupByModal = false;
      groupModal.style.display = "none";
    }
-
+   
    //function for hiding all list extensions for filter button
    function hideAllFilters() {
      customParameter.style.display = "none";
@@ -712,7 +523,7 @@
      underlay.style.display = "none";
      overlay.style.display = "none";
    }
-
+   
    //function for hiding all list extensions
    function hideAllGroupings() {
      customGroup.style.display = "none";
@@ -724,20 +535,20 @@
      //underlayGroup.style.display = "none";
      //overlayGroup.style.display = "none";
    }
-
+   
    function cancel(){
       hideFilterModal();
       hideGroupModal();
       hideAllFilters();
       hideAllGroupings();
    }
-
+   
    //Share button functions
-
+   
    var shareBtn = document.getElementById("shareBtn");
    var shareModal = document.getElementById("shareModal");
    var showShareModal = false;
-
+   
    function toggleShareButton(){
       showShareModal = !showShareModal;
       if(showShareModal){
@@ -747,7 +558,7 @@
          shareModal.style.display = "none";
       }
    }
-
+   
    document.addEventListener('click', function( event ) {
      if (shareModal !== event.target && shareBtn !== event.target && !shareBtn.contains(event.target) && !shareModal.contains(event.target)) {    
        console.log('clicking outside share div');
@@ -755,7 +566,177 @@
        shareModal.style.display = "none";
      }
    });
-
+   
    
 </script>
+<style type="text/css">
+   //percentage circle
+   .flex-wrapper {
+   display: flex;
+   flex-flow: row nowrap;
+   width: 5rem;
+   }
+   .single-chart {
+   width: 100%;
+   justify-content: space-around ;
+   }
+   .circular-chart {
+   display: block;
+   margin: 0 auto;
+   max-width: 80%;
+   max-height: 250px;
+   }
+   .circle-bg {
+   fill: none;
+   stroke: #eee;
+   stroke-width: 3.8;
+   }
+   .circle {
+   fill: none;
+   stroke-width: 2.8;
+   stroke-linecap: round;
+   animation: progress 1s ease-out forwards;
+   }
+   @keyframes progress {
+   0% {
+   stroke-dasharray: 0 100;
+   }
+   }
+   .circular-chart.orange .circle {
+   stroke: #ff9f00;
+   }
+   .circular-chart.green .circle {
+   stroke: #4CC790;
+   }
+   .circular-chart.blue .circle {
+   stroke: #3c9ee5;
+   }
+   .percentage {
+   fill: #666;
+   font-family: sans-serif;
+   font-size: 0.5em;
+   text-anchor: middle;
+   }
+   //circle end
+   .sonar-title{
+   font-family: Verdana,Arial,Helvetica,sans-serif;
+   font-size: 12px;
+   font-weight: bold;
+   color: #000000;
+   text-decoration: none;
+   }
+   .list-element{
+   padding: 0.75rem;
+   }
+   .filter-button{
+   background-color: #EBEBEB;
+   color: #757575;
+   border: none;
+   font-size: 1rem;
+   border-radius: 0.4rem;
+   display: flex;
+   outline: none;
+   }
+   .filter-button:hover{
+   transition: 0.25s;
+   background-color: #F8F8F8;
+   color: #939393;
+   }
+   /*CSS for add filter button elements*/
+   .dropdown-modal {
+   display: none;
+   z-index: 1;
+   left: 2rem;
+   top: 0rem;
+   width: fit-content;
+   height: fit-content;
+   overflow: auto;
+   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
+   margin-right: 0.5rem;
+   border-radius: 0.3rem;
+   }
+   .filter-category {
+   padding: 0.25rem 0.5rem;
+   font-size: 1rem;
+   margin: 0;
+   min-width: 8rem;
+   height: 1rem;
+   }
+   .filter-category:hover {
+   background-color: rgb(240, 240, 240);
+   }
+   .filter-list {
+   list-style-type: none;
+   padding: 0;
+   margin: 0;
+   }
+   .addfilter-button {
+   background: #ebebeb;
+   border-radius: 6px;
+   border: none;
+   padding: 0.5rem 1rem;
+   color: #727272;
+   margin-bottom: 1rem;
+   width: 9rem;
+   }
+   .addfilter-button:hover {
+   transition: 200ms;
+   background: #f5f5f5;
+   color: #9c9c9c;
+   }
+   .addfilter-button:active {
+   transition: 100ms;
+   background: #f5f5f5;
+   color: #d8d8d8;
+   }
+   .filter-selected-menu {
+   width: min-content;
+   display: none;
+   min-width: 11rem;
+   max-width: 20rem;
+   height: fit-content;
+   height: min-content;
+   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
+   border-radius: 0.3rem;
+   }
+   .pageButton {
+   border: none;
+   background: none;
+   font-size: 1rem;
+   margin-right: 1rem;
+   }
+   .cancelButton{
+   padding: 0.5rem 0.7rem;
+   border-radius: 3rem;
+   border: none;
+   margin: 1rem 1rem 0 0;
+   }
+   .cancelButton:hover{
+   transition: 100ms;
+   background-color: #f5f5f5;;
+   }
+   .cancelButton:active{
+   transition: 100ms;
+   background-color: #f5f5f5;
+   color: #d8d8d8;
+   }
+   .submitButton{
+   color: #FFF;
+   float: right;
+   border-radius: 3rem;
+   padding: 0.5rem 0.7rem;
+   border: none;
+   margin: 1rem 1rem 0 0;
+   background-color: #4798F9;
+   }
+   .submitButton:hover{
+   transition: 100ms;
+   background-color: #94BBEA;
+   }
+   .submitButton:active{
+   transition: 100ms;
+   background-color: #94BBEA;
+   color: #d8d8d8;
+   }
+</style>
 
