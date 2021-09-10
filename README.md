@@ -1,2 +1,2 @@
 # sitesonar
-Repo for backing up my sitesonar page in alimonitor
+Repo for sitesonar page in alimonitor
