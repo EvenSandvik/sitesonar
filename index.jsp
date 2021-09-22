@@ -68,7 +68,7 @@
     
 	Page listElement = new Page(null, "sitesonar/sonar_list.res");
     Page filterElement = new Page(null, "sitesonar/filterItem.res");
-
+    Page nodeListElement = new Page(null, "sitesonar/nodeList.res");
 
     // Filters
     // Collect host_ids of tests that satisfy filter
@@ -106,30 +106,72 @@
         }
     }
 
+    //TEST connection STUFF. TODO remove
+    /*final DB testDB;
+    testDB = new DB("SELECT test_name FROM sitesonar_tests LIMIT 5;");
+    while(testDB.moveNext()){
+        out.println(testDB.gets(1));
+    }*/
+    //END TEST
 
+
+
+
+    //FILTER ALL NODES
+
+    //TODO: write if that checks if in All Nodes modus
+
+    final DB nodeDB;
+
+    //Fetch site from url
+    String nodeSite = "Poznan";
+
+    String nodeTestName = "singularity";
+
+    String nodeMessage = "SUPPORTED";
+
+    nodeDB = new DB("SELECT test_name, test_message, ce_name, addr, hostname FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE test_name='" +  nodeTestName + "' AND test_message='" + nodeMessage + "' AND ce_name='" + nodeSite + "';");
+
+    while(nodeDB.moveNext()){
+        //Append each node to list
+        String hostname = nodeDB.gets(5);
+        String addr = nodeDB.gets(4);
+        nodeListElement.modify("host_name", hostname);
+        nodeListElement.modify("address", addr);
+        nodeListElement.modify("message", nodeMessage);
+        p.append("nodeList", nodeListElement);
+
+    }
+
+
+    //FILTER AND GROUP SITES
     final DB entireDB;
+
+    //TODO: a join for ce_name. Example SELECT host_id, test_message, sitesonar_hosts.host_id, test_name FROM sitesonar_tests WHERE test_name='singularity' " + filterString INNER JOIN sitesonar_hosts ON sitesonar pk = orders foreignkey
 
     //Fetch tests for grouping and filters
     if(request.getParameter("grouping") == "" || request.getParameter("grouping") == null){
         //By default, grouping is set to singularity
         if(filterLength > 0){
-             entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity' " + filterString);
-             //out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity' " + filterString);
+             entireDB = new DB("SELECT sitesonar_tests.host_id, test_message, ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE test_name='singularity' " + filterString);
+             //out.println("1");
         }
         else{
-            entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity';");
-            //out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='singularity';");
+            //entireDB = new DB("SELECT host_id, test_message, ce_name, test_name FROM sitesonar_tests WHERE test_name='singularity';");
+            entireDB = new DB("SELECT sitesonar_tests.host_id, test_message, ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE test_name='singularity';");
+            //With Inner Join
+            //out.println("2");
         }
         
     }
     else{
         if(filterLength > 0){
-            entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "'" + filterString);
-            //out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "'" + filterString);
+            entireDB = new DB("SELECT sitesonar_tests.host_id, test_message, ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE test_name='" + request.getParameter("grouping") + "'" + filterString);
+            //out.println("3");
         }
         else{
-            entireDB = new DB("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "';");
-            //out.println("SELECT host_id, test_message, site_name, test_name FROM sitesonar_tests WHERE test_name='" + request.getParameter("grouping") + "';");
+            entireDB = new DB("SELECT sitesonar_tests.host_id, test_message, ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE test_name='" + request.getParameter("grouping") + "';");
+            //out.println("4");
         }
         
     }
@@ -208,7 +250,7 @@
         // Iterate over sitesonar_tests with no filters
         while(entireDB.moveNext()){
 
-            //Fill site_name field if empty
+            //Fill ce_name field if empty
             if(!countSupportForSites.containsKey(entireDB.gets(3))){
                 countSupportForSites.put(entireDB.gets(3), 0);
                 countNotSupportForSites.put(entireDB.gets(3), 0);
@@ -224,8 +266,6 @@
         }
     }  
 
-    //token: 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
-    //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
     //Render list
     Page listHeaderSupport = new Page(null, "sitesonar/listHeader.res");
     Page listHeaderPercent = new Page(null, "sitesonar/listHeader.res");

@@ -182,13 +182,27 @@
                </tr>
                <<:testList:>>
             </table>
-         </div>
-         <p>
+            <p>
             <<:result_count:>> results
-         </p>
+            </p>
+         </div>
       </div>
       <div id="AllNodesPage" style="display: none;">
          <<:siteId:>>
+
+         <p>TODO: Filter button</p>
+
+
+
+         <table style="width:100%; margin-top:3rem; border-spacing: 0;">
+               <tr style="background-color: #c7daff;text-align: left;">
+                  <th class="list-element" style="font-weight: bold; ">Host name</th>
+                  <th>Address</th>
+                  <th class="list-element">Message</th>
+               </tr>
+               <<:nodeList:>>
+            </table>
+         
       </div>
    </div>
 </div>
@@ -279,7 +293,7 @@
    };
    
    //function for hiding all list extensions
-   function requestAndRefresh() {
+   /*function requestAndRefresh() {
      console.log("Clicked apply");
      var xhr = new XMLHttpRequest();
      xhr.open("POST", "http://localhost:8080/sitesonar/", true);
@@ -305,7 +319,7 @@
    
      xhr.open('GET', "http://localhost:8080/sitesonar/", true);
      xhr.send();
-   }
+   }*/
    
    var sitesButton = document.getElementById("sitesBtn");
    
