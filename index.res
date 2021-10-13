@@ -48,7 +48,7 @@
             </div>
             <br></br>
             <div id="filterButtonWrapper" style="display: contents;">
-               <button id="filterBtn" class="addfilter-button">Filter</button>
+               <button id="filterBtn" class="addfilter-button">Add filter + </button>
                <div style="display: flex; width: -moz-fit-content;position: absolute;background-color: #FFF;">
                   <div id="filterModal" class="dropdown-modal">
                      <ul class="filter-list">
@@ -128,12 +128,12 @@
             </div>
             <div>
                <p id="filteringText" style="font-size: 0.85rem; color: #444; margin: 0;">
-                  <<:filterParam:>> <<:filterValueParam:>>
+                  <<:filterParam:>> <<:filterJSONParam:>> <<:filterValueParam:>>
                </p>
             </div>
             <br></br>
             <div id="groupButtonWrapper" style="display: contents;">
-               <button id="groupBtn" class="addfilter-button">Add grouping +</button>
+               <button id="groupBtn" class="addfilter-button">Group by</button>
                <div style="display: flex;position: absolute;background-color: #FFF;">
                   <div id="groupModal" class="dropdown-modal">
                      <ul class="filter-list">
@@ -214,7 +214,7 @@
             </div>
             <div style="background-color: #EFEFEF; border-radius: 10rem; display: table; padding: 0.5rem 1rem;">
                <p id="groupingText" style="margin: 0; font-size: 0.7rem; color: #444;">
-                  <<:groupParam:>>: <<:valueParam:>>
+                  <<:groupParam:>>: <<:groupJSONParam:>> = <<:valueParam:>>
                </p>
             </div>
             <!-- <div style="display: flex;">
@@ -310,18 +310,27 @@
      /*if (new RegExp("[&?]"+name+"([=&].+)?$").test(url)) {
            url = url.replace(new RegExp("(?:[&?])"+name+"[^&]*", "g"), "")
        }*/
-   
+
+      console.log("URL: " + url)
      if(groupingParam != ""){
        //Add grouping parameter
        url += "?grouping=" + groupingParam;
 
-       url += "&JSONGroup=" + groupJSONParam;
+       console.log("JSON GROUP: " + groupJSONParam);
+      if(groupJSONParam != ""){
+         url += "&JSONGroup=" + groupJSONParam;
+      }
+      else{
+         url += "&JSONGroup=SINGULARITY_CVMFS_SUPPORTED";
+      }
+       console.log("URL2: " + url)
    
        if(valueParam != ""){
          url += "&value=" + valueParam;
        }
        else{
          //Must have value
+         url += "&value=TRUE";
        }
    
        if(filterArrayParam != ""){
@@ -480,12 +489,14 @@
    
    //Hovering custom
    liCustom.addEventListener("mouseenter", function (event) {
+      console.log("mouseEnter hideallFilters");
      hideAllFilters();
      customParameter.style.display = "block";
    });
    
    liCustomGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+      console.log("mouseEnter hideallFilters GROUP");
+     hideAllGroups();
      customParameterGroup.style.display = "block";
    });
    
@@ -496,7 +507,7 @@
    });
    
    liHMDGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      HMDGroup.style.display = "block";
    });
    
@@ -507,7 +518,7 @@
    });
 
    liLoopDevicesGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      loopDevicesGroup.style.display = "block";
    });
    
@@ -518,7 +529,7 @@
    });
 
    liContainerGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      containerGroup.style.display = "block";
    });
    
@@ -529,7 +540,7 @@
    });
 
    liUnameGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      unameGroup.style.display = "block";
    });
    
@@ -542,7 +553,7 @@
    
    //Hovering Singularity for Group
    liSingularityGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      singularityGroup.style.display = "block";
    });
    
@@ -553,7 +564,7 @@
    });
 
    liTMPGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      TMPGroup.style.display = "block";
    });
    
@@ -564,7 +575,7 @@
    });
 
    liUnderlayGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      underlayGroup.style.display = "block";
    });
    
@@ -575,11 +586,11 @@
    });
 
    liOverlayGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      overlayGroup.style.display = "block";
    });
    
-   // When the user clicks on the button, open the modal
+   // When the user clicks on the filter button, open the modal
    filterButton.onclick = function () {
      if (!showModal) {
        modal.style.display = "block";
@@ -591,32 +602,35 @@
      }
    };
    
-   // When the user clicks on the button, open the modal
+   // When the user clicks on the group button, open the modal
    groupBtn.onclick = function () {
      if (!showGroupByModal) {
        groupModal.style.display = "block";
        showGroupByModal = true;
      } else {
-       hideAllFilters();
+       hideAllGroups();
        groupModal.style.display = "none";
        showGroupByModal = false;
      }
    };
    
+   //Click outside the filter modal
    var filterModalWrapper = document.getElementById('filterButtonWrapper');
    document.addEventListener('click', function( event ) {
      if (filterModalWrapper !== event.target && !filterModalWrapper.contains(event.target)) {    
        console.log('clicking outside filter div');
+       console.log("filterModalWrapper");
        hideAllFilters();
        hideFilterModal();
      }
    });
    
+   //Click outside the group modal
    var groupButtonWrapper = document.getElementById('groupButtonWrapper');
    document.addEventListener('click', function( event ) {
      if (groupButtonWrapper !== event.target && !groupButtonWrapper.contains(event.target)) {    
        console.log('clicking outside group div');
-       hideAllFilters();
+       hideAllGroups();
        hideGroupModal();
      }
    });
@@ -640,6 +654,7 @@
    
    //function for hiding all list extensions for filter button
    function hideAllFilters() {
+      console.log("hideAllFilters");
       //Hide all filters
      customParameter.style.display = "none";
      HMD.style.display = "none";
@@ -647,12 +662,17 @@
      container.style.display = "none";
      uname.style.display = "none";
      singularity.style.display = "none";
-     singularityGroup.style.display = "none";
+
      TMP.style.display = "none";
      underlay.style.display = "none";
      overlay.style.display = "none";
 
-     //Hide all groupings
+     
+   }
+
+   function hideAllGroups() {
+   //Hide all groupings
+   console.log("hideAllGroup");
      customGroup.style.display = "none";
      HMDGroup.style.display = "none";
      loopDevicesGroup.style.display = "none";
@@ -661,12 +681,14 @@
      TMPGroup.style.display = "none";
      underlayGroup.style.display = "none";
      overlayGroup.style.display = "none";
+          singularityGroup.style.display = "none";
    }
    
    function cancel(){
       hideFilterModal();
       hideGroupModal();
       hideAllFilters();
+      console.log("cancel");
    }
    
    //Share button functions
