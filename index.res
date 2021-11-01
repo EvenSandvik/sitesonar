@@ -48,7 +48,7 @@
             </div>
             <br></br>
             <div id="filterButtonWrapper" style="display: contents;">
-               <button id="filterBtn" class="addfilter-button">Filter</button>
+               <button id="filterBtn" class="addfilter-button">Add filter + </button>
                <div style="display: flex; width: -moz-fit-content;position: absolute;background-color: #FFF;">
                   <div id="filterModal" class="dropdown-modal">
                      <ul class="filter-list">
@@ -65,10 +65,13 @@
                         <li id="liOverlay" class="filter-category">Overlay</li>
                      </ul>
                   </div>
+
                   <!-- All menus -->
                   <div id="custom" class="filter-selected-menu" style="padding: 1rem;">
                      <p style="margin: 0;font-size: 0.8rem;color: #555;">Name</p>
                      <input id="customFilterParameter" type="text" />
+                     <p style="margin: 0;font-size: 0.8rem;color: #555;">JSON parameter</p>
+                     <input id="customFilterJSONParameter" type="text" />
                      <p style="margin: 0;font-size: 0.8rem;color: #555;margin-top: 1rem;">Value</p>
                      <input id="customFilterValueParameter" type="text" />
                      <button onClick="cancel()" class="cancelButton">Cancel</button>
@@ -98,8 +101,8 @@
                   <div id="singularity" class="filter-selected-menu">
                      <ul class="filter-list">
                         <li class="filter-category">All</li>
-                        <li class="filter-category">Support singularity</li>
-                        <li class="filter-category">Not support singularity</li>
+                        <li class="filter-category" onClick="setFilter('singularity', 'SUPPORTED')">Support singularity</li>
+                        <li class="filter-category" onClick="setFilter('singularity', '')">Not support singularity</li>
                      </ul>
                   </div>
                   <div id="TMP" class="filter-selected-menu">
@@ -125,12 +128,12 @@
             </div>
             <div>
                <p id="filteringText" style="font-size: 0.85rem; color: #444; margin: 0;">
-                  <<:filterParam:>> <<:filterValueParam:>>
+                  <<:filterParam:>> <<:filterJSONParam:>> <<:filterValueParam:>>
                </p>
             </div>
             <br></br>
             <div id="groupButtonWrapper" style="display: contents;">
-               <button id="groupBtn" class="addfilter-button">Add grouping +</button>
+               <button id="groupBtn" class="addfilter-button">Group by</button>
                <div style="display: flex;position: absolute;background-color: #FFF;">
                   <div id="groupModal" class="dropdown-modal">
                      <ul class="filter-list">
@@ -147,16 +150,40 @@
                         <li id="liOverlayGroup" class="filter-category">Overlay</li>
                      </ul>
                   </div>
+
                   <!-- All menus -->
                   <div id="customGroup" class="filter-selected-menu" style="padding: 1rem;">
                      <p style="margin: 0;font-size: 0.8rem;color: #555;">Name</p>
                      <input id="customGroupParameter" type="text" />
+                     <p style="margin: 0;font-size: 0.8rem;color: #555;">JSON</p>
+                     <input id="customGroupJSONParameter" type="text" />
                      <p style="margin: 0;font-size: 0.8rem;color: #555;margin-top: 1rem;">Value</p>
                      <input id="customValueParameter" type="text" />
                      <button onClick="cancel()"  class="cancelButton">Cancel</button>
                      <button onClick="customGrouping()" class="submitButton">Add</button>
                   </div>
                   <br></br>
+                  <div id="HMDGroup" class="filter-selected-menu">
+                     <ul class="filter-list">
+                        <li class="filter-category">Show home directory</li>
+                     </ul>
+                  </div>
+                  <div id="loopDevicesGroup" class="filter-selected-menu">
+                     <p>TODO: Loop devices, what is a loop device</p>
+                  </div>
+                  <div id="containerEnabledGroup" class="filter-selected-menu">
+                     <ul class="filter-list">
+                        <li class="filter-category">All</li>
+                        <li class="filter-category">Docker</li>
+                        <li class="filter-category">Singularity</li>
+                        <li class="filter-category">No container</li>
+                     </ul>
+                  </div>
+                  <div id="unameGroup" class="filter-selected-menu">
+                     <ul class="filter-list">
+                        <li class="filter-category">Show uname</li>
+                     </ul>
+                  </div>
                   <div id="singularityGroup" class="filter-selected-menu">
                      <ul class="filter-list">
                         <li class="filter-category">All</li>
@@ -164,11 +191,30 @@
                         <li class="filter-category" onclick="setParameters('singularity', '')">Not support singularity</li>
                      </ul>
                   </div>
+                  <div id="TMPGroup" class="filter-selected-menu">
+                     <ul class="filter-list">
+                        <li class="filter-category">Show tmp folder</li>
+                     </ul>
+                  </div>
+                  <div id="underlayGroup" class="filter-selected-menu">
+                     <ul class="filter-list">
+                        <li class="filter-category">All</li>
+                        <li class="filter-category">Underlay enabled</li>
+                        <li class="filter-category">Underlay disabled</li>
+                     </ul>
+                  </div>
+                  <div id="overlayGroup" class="filter-selected-menu">
+                     <ul class="filter-list">
+                        <li class="filter-category">All</li>
+                        <li class="filter-category">Don't enable overlay</li>
+                        <li class="filter-category">Try enable overlay</li>
+                     </ul>
+                  </div>
                </div>
             </div>
             <div style="background-color: #EFEFEF; border-radius: 10rem; display: table; padding: 0.5rem 1rem;">
                <p id="groupingText" style="margin: 0; font-size: 0.7rem; color: #444;">
-                  <<:groupParam:>>: <<:valueParam:>>
+                  <<:groupParam:>>: <<:groupJSONParam:>> = <<:valueParam:>>
                </p>
             </div>
             <!-- <div style="display: flex;">
@@ -210,10 +256,14 @@
 
    //Set these values
    var groupingParam = "<<:groupParam:>>";
+
+   var groupJSONParam = "<<:groupJSONParam:>>";
    
    var valueParam = "<<:valueParam:>>";
    
    var filterArrayParam = "<<:filterParam:>>";
+
+   var filterJSONParam = "<<:filterJSONParam:>>";
    
    var filterValueParam = "<<:filterValueParam:>>";
    
@@ -239,6 +289,7 @@
    
    function customGrouping() {
      groupingParam = document.getElementById("customGroupParameter").value;
+     groupJSONParam = document.getElementById("customGroupJSONParameter").value;
      valueParam = document.getElementById("customValueParameter").value;
      changeGroupText();
      cancel();
@@ -246,6 +297,7 @@
    
    function customFiltering() {
      filterArrayParam = document.getElementById("customFilterParameter").value;
+     filterJSONParam = document.getElementById("customFilterJSONParameter").value;
      filterValueParam = document.getElementById("customFilterValueParameter").value;
      changeFilterText();
      cancel();
@@ -258,20 +310,32 @@
      /*if (new RegExp("[&?]"+name+"([=&].+)?$").test(url)) {
            url = url.replace(new RegExp("(?:[&?])"+name+"[^&]*", "g"), "")
        }*/
-   
+
+      console.log("URL: " + url)
      if(groupingParam != ""){
        //Add grouping parameter
        url += "?grouping=" + groupingParam;
+
+       console.log("JSON GROUP: " + groupJSONParam);
+      if(groupJSONParam != ""){
+         url += "&JSONGroup=" + groupJSONParam;
+      }
+      else{
+         url += "&JSONGroup=SINGULARITY_CVMFS_SUPPORTED";
+      }
+       console.log("URL2: " + url)
    
        if(valueParam != ""){
          url += "&value=" + valueParam;
        }
        else{
          //Must have value
+         url += "&value=TRUE";
        }
    
        if(filterArrayParam != ""){
          url += "&filterTestNames=" + filterArrayParam;
+         url += "&JSONFilter=" + filterJSONParam;
          if(filterValueParam != ""){
            url += "&filterTestMessages=" + filterValueParam;
          }
@@ -282,6 +346,7 @@
        //Must have grouping
        if(filterArrayParam != ""){
          url += "?filterTestNames=" + filterArrayParam;
+         url += "&JSONFilter=" + filterJSONParam;
          if(filterValueParam != ""){
            url += "&filterTestMessages=" + filterValueParam;
          }
@@ -335,7 +400,7 @@
    groupingParamBox = document.getElementById("customGroupParameter");
    valueParamBox = document.getElementById("customValueParameter");
    
-   
+   //Change to sites page
    sitesButton.onclick = function () {
      sitesPage.style.display = "block";
      nodesPage.style.display = "none";
@@ -344,6 +409,7 @@
      sitesButton.style.borderBottom = "3px solid #478BF2";
    };
    
+   //Change to nodes page
    nodesButton.onclick = function () {
      sitesPage.style.display = "none";
      nodesPage.style.display = "block";
@@ -352,8 +418,8 @@
      nodesButton.style.borderBottom = "3px solid #478BF2";
    };
    
+   //Filter and group by menu modals
    var showModal = false;
-   
    var showGroupByModal = false;
    
    // Get the modal
@@ -380,14 +446,21 @@
    //loop devices
    var liLoopDevices = document.getElementById("liLoop");
    var loopDevices = document.getElementById("loopDevices");
+   var liLoopDevicesGroup = document.getElementById("liLoopGroup");
+   var loopDevicesGroup = document.getElementById("loopDevicesGroup");
    
    //Container
    var liContainer = document.getElementById("liContainer");
    var container = document.getElementById("containerEnabled");
+   var liContainerGroup = document.getElementById("liContainerGroup");
+   var containerGroup = document.getElementById("containerEnabledGroup");
+
    
    //uname
    var liUname = document.getElementById("liUname");
    var uname = document.getElementById("uname");
+   var liUnameGroup = document.getElementById("liUnameGroup");
+   var unameGroup = document.getElementById("unameGroup");
    
    //Singularity
    var liSingularity = document.getElementById("liSingularity");
@@ -398,23 +471,32 @@
    //TMP
    var liTMP = document.getElementById("liTMP");
    var TMP = document.getElementById("TMP");
+   var liTMPGroup = document.getElementById("liTMPGroup");
+   var TMPGroup = document.getElementById("TMPGroup");
    
    //Underlay
    var liUnderlay = document.getElementById("liUnderlay");
    var underlay = document.getElementById("underlay");
+   var liUnderlayGroup = document.getElementById("liUnderlayGroup");
+   var underlayGroup = document.getElementById("underlayGroup");
    
    //Overlay
    var liOverlay = document.getElementById("liOverlay");
    var overlay = document.getElementById("overlay");
+   var liOverlayGroup = document.getElementById("liOverlayGroup");
+   var overlayGroup = document.getElementById("overlayGroup");
+   
    
    //Hovering custom
    liCustom.addEventListener("mouseenter", function (event) {
+      console.log("mouseEnter hideallFilters");
      hideAllFilters();
      customParameter.style.display = "block";
    });
    
    liCustomGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+      console.log("mouseEnter hideallFilters GROUP");
+     hideAllGroups();
      customParameterGroup.style.display = "block";
    });
    
@@ -424,10 +506,20 @@
      HMD.style.display = "block";
    });
    
+   liHMDGroup.addEventListener("mouseenter", function (event) {
+     hideAllGroups();
+     HMDGroup.style.display = "block";
+   });
+   
    //when hover over loop devices
    liLoopDevices.addEventListener("mouseenter", function (event) {
      hideAllFilters();
      loopDevices.style.display = "block";
+   });
+
+   liLoopDevicesGroup.addEventListener("mouseenter", function (event) {
+     hideAllGroups();
+     loopDevicesGroup.style.display = "block";
    });
    
    //Hovering Container 
@@ -435,11 +527,21 @@
      hideAllFilters();
      container.style.display = "block";
    });
+
+   liContainerGroup.addEventListener("mouseenter", function (event) {
+     hideAllGroups();
+     containerGroup.style.display = "block";
+   });
    
    //Hovering Uname 
    liUname.addEventListener("mouseenter", function (event) {
      hideAllFilters();
      uname.style.display = "block";
+   });
+
+   liUnameGroup.addEventListener("mouseenter", function (event) {
+     hideAllGroups();
+     unameGroup.style.display = "block";
    });
    
    //Hovering Singularity 
@@ -447,10 +549,11 @@
      hideAllFilters();
      singularity.style.display = "block";
    });
+
    
    //Hovering Singularity for Group
    liSingularityGroup.addEventListener("mouseenter", function (event) {
-     hideAllFilters();
+     hideAllGroups();
      singularityGroup.style.display = "block";
    });
    
@@ -459,11 +562,21 @@
      hideAllFilters();
      TMP.style.display = "block";
    });
+
+   liTMPGroup.addEventListener("mouseenter", function (event) {
+     hideAllGroups();
+     TMPGroup.style.display = "block";
+   });
    
    //Hovering Underlay
    liUnderlay.addEventListener("mouseenter", function (event) {
      hideAllFilters();
      underlay.style.display = "block";
+   });
+
+   liUnderlayGroup.addEventListener("mouseenter", function (event) {
+     hideAllGroups();
+     underlayGroup.style.display = "block";
    });
    
    //Hovering Overlay
@@ -471,8 +584,13 @@
      hideAllFilters();
      overlay.style.display = "block";
    });
+
+   liOverlayGroup.addEventListener("mouseenter", function (event) {
+     hideAllGroups();
+     overlayGroup.style.display = "block";
+   });
    
-   // When the user clicks on the button, open the modal
+   // When the user clicks on the filter button, open the modal
    filterButton.onclick = function () {
      if (!showModal) {
        modal.style.display = "block";
@@ -484,35 +602,45 @@
      }
    };
    
-   // When the user clicks on the button, open the modal
+   // When the user clicks on the group button, open the modal
    groupBtn.onclick = function () {
      if (!showGroupByModal) {
        groupModal.style.display = "block";
        showGroupByModal = true;
      } else {
-       hideAllFilters();
+       hideAllGroups();
        groupModal.style.display = "none";
        showGroupByModal = false;
      }
    };
    
+   //Click outside the filter modal
    var filterModalWrapper = document.getElementById('filterButtonWrapper');
    document.addEventListener('click', function( event ) {
      if (filterModalWrapper !== event.target && !filterModalWrapper.contains(event.target)) {    
        console.log('clicking outside filter div');
+       console.log("filterModalWrapper");
        hideAllFilters();
        hideFilterModal();
      }
    });
    
+   //Click outside the group modal
    var groupButtonWrapper = document.getElementById('groupButtonWrapper');
    document.addEventListener('click', function( event ) {
      if (groupButtonWrapper !== event.target && !groupButtonWrapper.contains(event.target)) {    
        console.log('clicking outside group div');
-       hideAllGroupings();
+       hideAllGroups();
        hideGroupModal();
      }
    });
+
+   function setFilter(param1, param2){
+      filterArrayParam = param1;
+      filterValueParam = param2;
+      changeFilterText();
+      cancel();
+   }
    
    function hideFilterModal(){
      showModal = false;
@@ -526,35 +654,41 @@
    
    //function for hiding all list extensions for filter button
    function hideAllFilters() {
+      console.log("hideAllFilters");
+      //Hide all filters
      customParameter.style.display = "none";
      HMD.style.display = "none";
      loopDevices.style.display = "none";
      container.style.display = "none";
      uname.style.display = "none";
      singularity.style.display = "none";
-     singularityGroup.style.display = "none";
+
      TMP.style.display = "none";
      underlay.style.display = "none";
      overlay.style.display = "none";
+
+     
    }
-   
-   //function for hiding all list extensions
-   function hideAllGroupings() {
+
+   function hideAllGroups() {
+   //Hide all groupings
+   console.log("hideAllGroup");
      customGroup.style.display = "none";
-     //HMDGroup.style.display = "none";
-     //loopDevicesGroup.style.display = "none";
-     //containerGroup.style.display = "none";
-     //unameGroup.style.display = "none";
-     //TMPGroup.style.display = "none";
-     //underlayGroup.style.display = "none";
-     //overlayGroup.style.display = "none";
+     HMDGroup.style.display = "none";
+     loopDevicesGroup.style.display = "none";
+     containerGroup.style.display = "none";
+     unameGroup.style.display = "none";
+     TMPGroup.style.display = "none";
+     underlayGroup.style.display = "none";
+     overlayGroup.style.display = "none";
+          singularityGroup.style.display = "none";
    }
    
    function cancel(){
       hideFilterModal();
       hideGroupModal();
       hideAllFilters();
-      hideAllGroupings();
+      console.log("cancel");
    }
    
    //Share button functions
