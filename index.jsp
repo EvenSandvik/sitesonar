@@ -62,8 +62,49 @@
     List<String> filterTestName = new ArrayList<String>();
     List<String> filterTestMessage = new ArrayList<String>();
 
-    int weekOld = 1;
-
+    //Set test age
+    long DAY_IN_MS = 1000 * 60 * 60 * 24;
+    long testAge = (System.currentTimeMillis() - (7 * DAY_IN_MS)) / 1000l;
+    if(request.getParameter("testAge") != null){
+        switch(request.getParameter("testAge")) {
+            case "0":
+                // 1 week
+                testAge = (System.currentTimeMillis() - (7 * DAY_IN_MS)) / 1000l;
+                
+                p.modify("ageOptionText", "1 week");
+                p.modify("ageOptionValue", "0");
+                break;
+            case "1":
+                // 2 weeks
+                testAge = (System.currentTimeMillis() - (14 * DAY_IN_MS)) / 1000l;
+                p.modify("ageOptionText", "2 weeks");
+                p.modify("ageOptionValue", "1");
+                break;
+            case "2":
+                // 1 month
+                testAge = (System.currentTimeMillis() - (30 * DAY_IN_MS)) / 1000l;
+                p.modify("ageOptionText", "1 month");
+                p.modify("ageOptionValue", "2");
+                break;
+            case "3":
+                // 6 months
+                testAge = (System.currentTimeMillis() - (183 * DAY_IN_MS)) / 1000l;
+                p.modify("ageOptionText", "6 months");
+                p.modify("ageOptionValue", "3");
+                break;
+            case "4":
+                // 1 year
+                testAge = (System.currentTimeMillis() - (365 * DAY_IN_MS)) / 1000l;
+                p.modify("ageOptionText", "1 year");
+                p.modify("ageOptionValue", "4");
+                break;
+            default:
+                // default to 1 week
+                testAge = (System.currentTimeMillis() - (7 * DAY_IN_MS)) / 1000l;
+                p.modify("ageOptionText", "Select option");
+                p.modify("ageOptionValue", "0");
+        }
+    }
     //If there aren't filter parameters
     if(request.getParameter("filterTestNames") == "" || request.getParameter("filterTestNames") == null){
         filterLength = 0;
@@ -87,7 +128,7 @@
             filterString += " AND test_name='" + filterTestName.get(i) + "'";
         }
         
-        filterString += "AND last_updated > '" + weekOld + "';";
+        filterString += "AND last_updated > '" + testAge + "';";
 
         //Render filters
         for(int i = 0; i < filterLength; i++){
@@ -134,38 +175,29 @@
 
         //No grouping but filter
         if(isFiltering){
-             sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + weekOld + "' AND test_name='singularity' " + filterString);
-             filterDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONFilter")  + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + weekOld  + "' " +  filterString);
-             out.println("1");
-             out.println(filterString);
+             sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='singularity' " + filterString);
+             filterDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONFilter")  + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge  + "' " +  filterString);
         }
         //No filter and no grouping
         else{
-            //sitesDB = new DB("SELECT host_id, test_message, ce_name, test_name FROM sitesonar_tests WHERE test_name='singularity';");
-            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + weekOld + "' AND test_name='singularity';");
+            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='singularity';");
             filterDB = new DB();//EMPTY
-            //JSON EXAMPLE: SELECT * FROM sitesonar_tests WHERE test_message_json ->> 'SINGULARITY_CVMFS_SUPPORTED' ::text = 'TRUE';
-            //sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message, ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE test_message_json ->> 'SINGULARITY_CVMFS_SUPPORTED' ::text = 'TRUE';");
-            
-            //With Inner Join
-            out.println("2");
+
         }
         
     }
     else{
         //Grouping and filter
         if(isFiltering){
-            //sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json, ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + weekOld + "' AND test_name='" + request.getParameter("grouping") + "'" + filterString);
+            //sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json, ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='" + request.getParameter("grouping") + "'" + filterString);
             
-            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONGroup") + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + weekOld + "' AND test_name='" + request.getParameter("grouping") + "'");
-            filterDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONFilter")  + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + weekOld + "' " + filterString);
-            out.println("3");
+            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONGroup") + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='" + request.getParameter("grouping") + "'");
+            filterDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONFilter")  + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' " + filterString);
         }
         //Only grouping
         else{
-            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONGroup") + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + weekOld + "' AND test_name='" + request.getParameter("grouping") + "';");
+            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONGroup") + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='" + request.getParameter("grouping") + "';");
             filterDB = new DB();//EMPTY
-            out.println("4");
         }
     }
     
@@ -191,6 +223,9 @@
     //0: init
     HashMap<String, Integer> filterSupportMap = new HashMap<String, Integer>();
 
+
+    //TODO filter is not working properly
+
     //If there are filters, remove nodes that are filtered out
     if(isFiltering){
 
@@ -212,11 +247,16 @@
                 filterSupportMap.put(hostID, 0);
             }
 
-            //Filtering
-            //If message not equals filter message, put 1 to indicate it should be filtered out
-            if(!JSONMessage.contains(filterTestMessage.get(0))){
+            
+            //No longer used: If message not equals filter message, put 1 to indicate it should be filtered out
+            /*if(!JSONMessage.contains(filterTestMessage.get(0))){
                 filterSupportMap.put(filterDB.gets(1), 1);
-            }  
+            }*/
+
+            //INCLUDE the ones that pass the filter
+            if(JSONMessage.contains(filterTestMessage.get(0))){
+                filterSupportMap.put(filterDB.gets(1), 3);
+            }
         }
 
         // Add elements which by grouping
@@ -225,7 +265,6 @@
             String JSONMessage = sitesDB.gets(2);
             String ceName  = sitesDB.gets(3);
 
-            //out.println(sitesDB.gets(3) + ": " + sitesDB.gets(2) + ";");
             //Put ce_name field if empty, init with 0
             if(!countSupportForSites.containsKey(ceName)){
                 countSupportForSites.put(ceName, 0);
@@ -236,19 +275,18 @@
                 filterSupportMap.put(hostID, 0);
             }
 
-            //if test_name is grouping. CAN REMOVE THIS
             //If test_message is correct and not hostid not visited, add message to already existing row
-                out.println("JSON: " + JSONMessage + " = " + groupMessage + ";");
-                if(JSONMessage.contains(groupMessage) && filterSupportMap.get(hostID) != 1){
-                    out.println("Counted");
+                if(JSONMessage.contains(groupMessage) && filterSupportMap.get(hostID) == 3){
+
                     //Count match with message
                     countSupportForSites.put(ceName, (countSupportForSites.get(ceName)+1));
+                    addToNodeList(p, hostID, ceName, JSONMessage);
                     
                     //Set hostid to visited
                     filterSupportMap.put(hostID, 2);
                 }
-                else if(filterSupportMap.get(hostID) != 1){
-                    out.println("Counted Negative");
+                else if(filterSupportMap.get(hostID) == 3){
+
                     //Count not matching with message
                     countNotSupportForSites.put(ceName, (countNotSupportForSites.get(ceName)+1));
                 }
@@ -270,11 +308,12 @@
             }
 
             //If test_message is correct, add groupMessage to already existing row
-            out.println(groupMessage + " = " + sitesDB.gets(2) +";");
+
 
             //Contains instead of equals, since some string values are written, e.g "TRUE" instead of TRUE
             if(sitesDB.gets(2).contains(groupMessage)){
                 countSupportForSites.put(sitesDB.gets(3), (countSupportForSites.get(sitesDB.gets(3))+1));
+                addToNodeList(p, hostID, ceName, JSONMessage);
             }
             else{
                 countNotSupportForSites.put(sitesDB.gets(3), (countNotSupportForSites.get(sitesDB.gets(3))+1));
@@ -289,8 +328,8 @@
     Page listHeaderTotal = new Page(null, "sitesonar/listHeader.res");
     
     listHeaderSupport.modify("header_name", groupJSON + " = " + groupMessage);
-    listHeaderOther.modify("header_name", "Other nodes");
-    listHeaderPercent.modify("header_name", "Nodes supported");
+    listHeaderOther.modify("header_name", "Other worker nodes");
+    listHeaderPercent.modify("header_name", "Worker nodes supported");
     listHeaderTotal.modify("header_name", "Total");
     
     p.append("list_header", listHeaderSupport);
@@ -339,11 +378,15 @@
     //set values in index.res and append to master page
     setValuesForSiteSonarHTML(p, totalCEs, totalSupportedCEs, groupingName, groupJSON, groupMessage, resultSites);
     if(request.getParameter("filterTestNames") != null){
-        p.modify("filterParam", request.getParameter("filterTestNames") + ": ");
+        p.modify("filterParam", request.getParameter("filterTestNames"));
+    }
+    if(request.getParameter("JSONFilter") != null){
+        p.modify("filterJSONParam", request.getParameter("JSONFilter"));
     }
     if(request.getParameter("filterTestMessages") != null){
         p.modify("filterValueParam", request.getParameter("filterTestMessages"));
     }
+
     pMaster.append(p);
     
     pMaster.write();
@@ -377,5 +420,13 @@
         p.modify("groupJSONParam", groupJSON);
         p.modify("valueParam", groupMessage);
         p.modify("result_count", resultSites);
+    }
+
+    public void addToNodeList(Page p, String hostName, String ceName, String message){
+        Page nodeList = new Page(null, "sitesonar/nodeList.res");
+        nodeList.modify("host_name", hostName);
+        nodeList.modify("ceName", ceName);
+        nodeList.modify("message", message);
+        p.append("nodeList", nodeList);
     }
 %>
