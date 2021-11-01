@@ -6,6 +6,6 @@
 
 <tr style="margin: 1rem;">
     <td class="list-element"> <<:host_name:>> </td>
-    <td class="list-element"><<:address:>></td>
+    <td class="list-element"><<:ceName:>></td>
     <td class="list-element"><<:message:>></td>
 </tr>
