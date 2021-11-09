@@ -1,4 +1,215 @@
 <!-- HTML and js functions for the Site Sonar web interface -->
+<style type="text/css">
+
+   //percentage circle css
+   .flex-wrapper {
+      display: flex;
+      flex-flow: row nowrap;
+   }
+
+   .single-chart {
+      width: 33%;
+      justify-content: space-around ;
+   }
+
+   .circular-chart {
+      display: block;
+      margin: 10px auto;
+      max-width: 80%;
+      max-height: 250px;
+   }
+
+   .circle-bg {
+      fill: none;
+      stroke: #eee;
+      stroke-width: 3.8;
+   }
+
+   .circle {
+      fill: none;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      animation: progress 1s ease-out forwards;
+   }
+
+   @keyframes progress {
+   0% {
+      stroke-dasharray: 0 100;
+   }
+   }
+
+   .circular-chart.orange .circle {
+      stroke: #ff9f00;
+   }
+
+   .circular-chart.green .circle {
+      stroke: #4CC790;
+   }
+
+   .circular-chart.blue .circle {
+      stroke: #3c9ee5;
+   }
+
+   .percentage {
+      fill: #666;
+      font-family: sans-serif;
+      font-size: 0.5em;
+      text-anchor: middle;
+   }
+   //percentage circle css end
+
+   .sonar-title{
+      font-family: Verdana,Arial,Helvetica,sans-serif;
+      font-size: 12px;
+      font-weight: bold;
+      color: #000000;
+      text-decoration: none;
+   }
+   .list-element{
+      padding: 0.75rem;
+   }
+   .filter-button{
+      background-color: #EBEBEB;
+      color: #757575;
+      border: none;
+      font-size: 1rem;
+      border-radius: 0.4rem;
+      display: flex;
+      outline: none;
+   }
+   .filter-button:hover{
+   transition: 0.25s;
+   background-color: #F8F8F8;
+   color: #939393;
+   }
+   /*CSS for add filter button elements*/
+   .dropdown-modal {
+   display: none;
+   z-index: 1;
+   left: 2rem;
+   top: 0rem;
+   width: fit-content;
+   height: fit-content;
+   overflow: auto;
+   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
+   margin-right: 0.5rem;
+   border-radius: 0.3rem;
+   }
+   .filter-category {
+   padding: 0.25rem 0.5rem;
+   font-size: 1rem;
+   margin: 0;
+   min-width: 8rem;
+   }
+   .filter-category:hover {
+   background-color: rgb(240, 240, 240);
+   }
+   .filter-list {
+   list-style-type: none;
+   padding: 0;
+   margin: 0;
+   }
+   .addfilter-button {
+   background: #70a2ff;
+   border-radius: 6px;
+   border: none;
+   padding: 0.5rem 1rem;
+   color: white;
+   margin-bottom: 1rem;
+   width: 9rem;
+   }
+   .addfilter-button:hover {
+   transition: 200ms;
+   background: #a3c3ff;
+   color: #eee;
+   }
+   .addfilter-button:active {
+   transition: 100ms;
+   background: #f5f5f5;
+   color: #e6e6e6;
+   }
+   .filter-selected-menu {
+   width: min-content;
+   display: none;
+   min-width: 11rem;
+   max-width: 20rem;
+   height: fit-content;
+   height: min-content;
+   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
+   border-radius: 0.3rem;
+   }
+   .pageButton {
+   border: none;
+   background: none;
+   font-size: 1rem;
+   margin-right: 1rem;
+   }
+   .cancelButton{
+   padding: 0.5rem 0.7rem;
+   border-radius: 3rem;
+   border: none;
+   margin: 1rem 1rem 0 0;
+   }
+   .cancelButton:hover{
+   transition: 100ms;
+   background-color: #f5f5f5;;
+   }
+   .cancelButton:active{
+   transition: 100ms;
+   background-color: #f5f5f5;
+   color: #d8d8d8;
+   }
+   .submitButton{
+   color: #FFF;
+   float: right;
+   border-radius: 3rem;
+   padding: 0.5rem 0.7rem;
+   border: none;
+   margin: 1rem 1rem 0 0;
+   background-color: #4798F9;
+   }
+   .submitButton:hover{
+   transition: 100ms;
+   background-color: #94BBEA;
+   }
+   .submitButton:active{
+   transition: 100ms;
+   background-color: #94BBEA;
+   color: #d8d8d8;
+   }
+
+   .searchParamDiv{
+      font-size: 0.7rem;
+      background-color: #4183FF;
+      border-radius: 10rem;
+      padding: 0.5rem 1rem;
+      color: white;
+      display: table;
+   }
+   .removeFilterButton{
+      border: none;
+      border-radius: 1rem;
+      padding: 0.4rem 0.65rem;
+      background: #ff7979;
+      color: white;
+      display: none;
+   }
+   #infoTable th, #infoTable td{
+      border: 1px solid black;
+      padding: 0.7rem;
+      border-collapse: collapse;
+   }
+
+   #filteringText{
+      display: none;
+   }
+
+   #removeFilter{
+      display: none;
+   }
+
+</style>
+
 
 <div style="font-family:Verdana,Helvetica,Arial,sans-serif;">
    <div style="display:flex; position:relative">
@@ -242,7 +453,7 @@
             <!-- <div style="display: flex;">
                <<:filters:>>
                </div> -->
-            <button onclick="replace_search()" class="addfilter-button" style="position:absolute;right: 0; color: #5188CA;padding: 0.5rem 1rem;">Apply</button>
+            <button onclick="replace_search()" class="addfilter-button" style="position:absolute;right: 0; color: white;padding: 0.5rem 1rem;">Apply</button>
             <table style="width:100%; margin-top:3rem; border-spacing: 0;">
                <tr style="background-color: #c7daff;text-align: left;">
                   <th class="list-element" style="font-weight: bold; ">CE Name</th>
@@ -255,18 +466,28 @@
             </p>
          </div>
       </div>
-      <div id="AllNodesPage" style="display: none;">
-         <!-- <<:siteId:>> -->
- 
-         <!-- <p>TODO: Filter button</p> -->
+      <div id="AllNodesPage" style="display: none; position: relative;">
 
          <h3 style="margin:1rem 0 0.5rem 0;">List of the worker nodes</h3>
             <p style="color:#929292; font-size:12px;margin:0">The list consists of the individual worker nodes that fulfil the criteria of the grouping and filter</p>
+            
+         <!-- <<:siteId:>> -->
+
+         <div>
+            <br></br>
+               <p style="color: #444; font-size: 1rem; margin: 0.3rem 0;">Choose CE</p>
+               <select name="nodeSite" id="nodeSite">
+                  <option disabled selected value="<<:selectedNodeSite:>>"><<:selectedNodeSite:>></option>
+                  <<:uniqueSiteOption:>>
+               </select>
+            </div>
+
+            <button onclick="replace_search()" class="addfilter-button" style="position:absolute;right: 0; color: white;padding: 0.5rem 1rem;">Apply</button>
 
          <table style="width:100%; margin-top:3rem; border-spacing: 0;">
                <tr style="background-color: #c7daff;text-align: left;">
                   <th class="list-element" style="font-weight: bold; ">Host ID</th>
-                  <th>CE name</th>
+                  <th class="list-element" style="font-weight: bold; ">CE name</th>
                   <th class="list-element"><<:groupJSONParam:>> </th>
                </tr>
                <<:nodeList:>>
@@ -403,6 +624,7 @@
       </div>
    </div>
 </div>
+
 <script type="text/javascript">
 
    //Set these values
@@ -466,6 +688,8 @@
 
      var maximumTestAgeVal = document.getElementById('testAge').selectedOptions[0].value;
 
+     var nodeSiteOption = document.getElementById('nodeSite').selectedOptions[0].value;
+
      if(groupingParam != ""){
        //Add grouping parameter
        url += "?grouping=" + groupingParam;
@@ -496,6 +720,9 @@
        // add maximum age for test
       url += "&testAge=" +  maximumTestAgeVal;
 
+      // add the site All nodes should list out
+      url += "&nodeSite=" + nodeSiteOption;
+
        
      }
      else{
@@ -510,6 +737,9 @@
 
        // add maximum age for test
        url += "&testAge=" +  maximumTestAgeVal;
+
+      // add the site All nodes should list out
+       url += "&nodeSite=" + nodeSiteOption;
    
      }
        // there is an official order for the query and the hash
@@ -916,214 +1146,3 @@
    
    
 </script>
-<style type="text/css">
-
-   //percentage circle css
-   .flex-wrapper {
-   display: flex;
-   flex-flow: row nowrap;
-   }
-
-   .single-chart {
-   width: 33%;
-   justify-content: space-around ;
-   }
-
-   .circular-chart {
-   display: block;
-   margin: 10px auto;
-   max-width: 80%;
-   max-height: 250px;
-   }
-
-   .circle-bg {
-   fill: none;
-   stroke: #eee;
-   stroke-width: 3.8;
-   }
-
-   .circle {
-   fill: none;
-   stroke-width: 2.8;
-   stroke-linecap: round;
-   animation: progress 1s ease-out forwards;
-   }
-
-   @keyframes progress {
-   0% {
-      stroke-dasharray: 0 100;
-   }
-   }
-
-   .circular-chart.orange .circle {
-   stroke: #ff9f00;
-   }
-
-   .circular-chart.green .circle {
-   stroke: #4CC790;
-   }
-
-   .circular-chart.blue .circle {
-   stroke: #3c9ee5;
-   }
-
-   .percentage {
-   fill: #666;
-   font-family: sans-serif;
-   font-size: 0.5em;
-   text-anchor: middle;
-   }
-   //percentage circle css end
-
-   .sonar-title{
-   font-family: Verdana,Arial,Helvetica,sans-serif;
-   font-size: 12px;
-   font-weight: bold;
-   color: #000000;
-   text-decoration: none;
-   }
-   .list-element{
-   padding: 0.75rem;
-   }
-   .filter-button{
-   background-color: #EBEBEB;
-   color: #757575;
-   border: none;
-   font-size: 1rem;
-   border-radius: 0.4rem;
-   display: flex;
-   outline: none;
-   }
-   .filter-button:hover{
-   transition: 0.25s;
-   background-color: #F8F8F8;
-   color: #939393;
-   }
-   /*CSS for add filter button elements*/
-   .dropdown-modal {
-   display: none;
-   z-index: 1;
-   left: 2rem;
-   top: 0rem;
-   width: fit-content;
-   height: fit-content;
-   overflow: auto;
-   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
-   margin-right: 0.5rem;
-   border-radius: 0.3rem;
-   }
-   .filter-category {
-   padding: 0.25rem 0.5rem;
-   font-size: 1rem;
-   margin: 0;
-   min-width: 8rem;
-   }
-   .filter-category:hover {
-   background-color: rgb(240, 240, 240);
-   }
-   .filter-list {
-   list-style-type: none;
-   padding: 0;
-   margin: 0;
-   }
-   .addfilter-button {
-   background: #ebebeb;
-   border-radius: 6px;
-   border: none;
-   padding: 0.5rem 1rem;
-   color: #727272;
-   margin-bottom: 1rem;
-   width: 9rem;
-   }
-   .addfilter-button:hover {
-   transition: 200ms;
-   background: #f5f5f5;
-   color: #9c9c9c;
-   }
-   .addfilter-button:active {
-   transition: 100ms;
-   background: #f5f5f5;
-   color: #d8d8d8;
-   }
-   .filter-selected-menu {
-   width: min-content;
-   display: none;
-   min-width: 11rem;
-   max-width: 20rem;
-   height: fit-content;
-   height: min-content;
-   box-shadow: 0px 2px 2px 2px rgb(0 0 0 / 10%);
-   border-radius: 0.3rem;
-   }
-   .pageButton {
-   border: none;
-   background: none;
-   font-size: 1rem;
-   margin-right: 1rem;
-   }
-   .cancelButton{
-   padding: 0.5rem 0.7rem;
-   border-radius: 3rem;
-   border: none;
-   margin: 1rem 1rem 0 0;
-   }
-   .cancelButton:hover{
-   transition: 100ms;
-   background-color: #f5f5f5;;
-   }
-   .cancelButton:active{
-   transition: 100ms;
-   background-color: #f5f5f5;
-   color: #d8d8d8;
-   }
-   .submitButton{
-   color: #FFF;
-   float: right;
-   border-radius: 3rem;
-   padding: 0.5rem 0.7rem;
-   border: none;
-   margin: 1rem 1rem 0 0;
-   background-color: #4798F9;
-   }
-   .submitButton:hover{
-   transition: 100ms;
-   background-color: #94BBEA;
-   }
-   .submitButton:active{
-   transition: 100ms;
-   background-color: #94BBEA;
-   color: #d8d8d8;
-   }
-
-   .searchParamDiv{
-      font-size: 0.7rem;
-      background-color: #4183FF;
-      border-radius: 10rem;
-      padding: 0.5rem 1rem;
-      color: white;
-      display: table;
-   }
-   .removeFilterButton{
-      border: none;
-      border-radius: 1rem;
-      padding: 0.4rem 0.65rem;
-      background: #ff7979;
-      color: white;
-      display: none;
-   }
-   #infoTable th, #infoTable td{
-      border: 1px solid black;
-      padding: 0.7rem;
-      border-collapse: collapse;
-   }
-
-   #filteringText{
-      display: none;
-   }
-
-   #removeFilter{
-      display: none;
-   }
-
-</style>
-

@@ -48,13 +48,27 @@
     Page listElement = new Page(null, "sitesonar/sonar_list.res");
     Page filterElement = new Page(null, "sitesonar/filterItem.res");
     Page nodeListElement = new Page(null, "sitesonar/nodeList.res");
+    Page siteOption = new Page(null, "sitesonar/uniqueSiteOption.res");
 
     //List of all unique sites
     ArrayList<String> sites = new ArrayList<String>();
 
     //Add unique site names to the sites list, and append to the Site ID dropdown menu
-    addUniqueSites(unique_ce_names, siteElement, sites, siteId, p);
+    //addUniqueSites(unique_ce_names, siteElement, sites, siteId, p);
     
+    // What CE's nodes the "All nodes" page should list ous
+    String sitenameAllNodes = "PNPI";
+    if(request.getParameter("nodeSite") != null){
+        sitenameAllNodes = request.getParameter("nodeSite");
+    } 
+    p.modify("selectedNodeSite", sitenameAllNodes);
+
+    while (unique_ce_names.moveNext()){
+            sites.add(unique_ce_names.gets(1));
+            siteOption.modify("cename", unique_ce_names.gets(1));
+            p.append("uniqueSiteOption", siteOption);
+    }
+
     // Filters
     // Collect host_ids of tests that satisfy filter
     int filterLength;
@@ -148,19 +162,6 @@
 
     String nodeMessage = "SUPPORTED";
 
-    nodeDB = new DB("SELECT test_name, test_message, ce_name, addr, hostname FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE test_name='" +  nodeTestName + "' AND test_message='" + nodeMessage + "' AND ce_name='" + nodeSite + "';");
-
-    while(nodeDB.moveNext()){
-        //Append each node to list
-        String hostname = nodeDB.gets(5);
-        String addr = nodeDB.gets(4);
-        nodeListElement.modify("host_name", hostname);
-        nodeListElement.modify("address", addr);
-        nodeListElement.modify("message", nodeMessage);
-        p.append("nodeList", nodeListElement);
-
-    }
-
     //Filter "Sites" Page
     final DB sitesDB;
     final DB filterDB;
@@ -182,7 +183,6 @@
         else{
             sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='singularity';");
             filterDB = new DB();//EMPTY
-
         }
         
     }
@@ -222,6 +222,7 @@
     //1: false if it was 2 remove -1 from countSupportForSites and add +1 to not support, 
     //0: init
     HashMap<String, Integer> filterSupportMap = new HashMap<String, Integer>();
+
 
 
     //TODO filter is not working properly
@@ -275,12 +276,16 @@
                 filterSupportMap.put(hostID, 0);
             }
 
+            
             //If test_message is correct and not hostid not visited, add message to already existing row
                 if(JSONMessage.contains(groupMessage) && filterSupportMap.get(hostID) == 3){
 
                     //Count match with message
                     countSupportForSites.put(ceName, (countSupportForSites.get(ceName)+1));
-                    addToNodeList(p, hostID, ceName, JSONMessage);
+                    
+                    if(ceName.contains(sitenameAllNodes)){
+                        addToNodeList(p, hostID, ceName, JSONMessage);
+                    }
                     
                     //Set hostid to visited
                     filterSupportMap.put(hostID, 2);
@@ -309,11 +314,12 @@
 
             //If test_message is correct, add groupMessage to already existing row
 
-
             //Contains instead of equals, since some string values are written, e.g "TRUE" instead of TRUE
             if(sitesDB.gets(2).contains(groupMessage)){
                 countSupportForSites.put(sitesDB.gets(3), (countSupportForSites.get(sitesDB.gets(3))+1));
-                addToNodeList(p, hostID, ceName, JSONMessage);
+                if(ceName.contains(sitenameAllNodes)){
+                        addToNodeList(p, hostID, ceName, JSONMessage);
+                }
             }
             else{
                 countNotSupportForSites.put(sitesDB.gets(3), (countNotSupportForSites.get(sitesDB.gets(3))+1));
@@ -368,7 +374,9 @@
                 listElement.modify("site_name", sites.get(i));
                 listElement.modify("supported_nodes", countSupportForSites.get(sites.get(i)));
                 listElement.modify("not_supported_nodes", countNotSupportForSites.get(sites.get(i)));
-                listElement.modify("percent_support", percentSupport + "%");
+
+                //Only two decimal for percent
+                listElement.modify("percent_support",  (Math.floor(percentSupport * 100) / 100) + "%");
                 listElement.modify("total", total);
                 p.append("testList", listElement);
             }
