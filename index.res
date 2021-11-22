@@ -299,50 +299,50 @@
                   </div>
                   <div id="HMD" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setFilter('cpu_info', 'cpu cores','32')">CPU cores: 32</li>
-                        <li class="filter-category" onclick="setFilter('cpu_info', 'wp','yes')">WP: yes</li>
-                        <li class="filter-category" onclick="setFilter('cpu_info', 'fpu','yes')">FPU: yes</li>
+                        <li class="filter-category" onclick="setFilter('cpu_info.sh', 'CPU_cpu_cores','32')">CPU cores: 32</li>
+                        <li class="filter-category" onclick="setFilter('cpu_info.sh', 'CPU_wp','TRUE')">WP: TRUE</li>
+                        <li class="filter-category" onclick="setFilter('cpu_info.sh', 'CPU_fpu','yes')">FPU: yes</li>
                      </ul>
                   </div>
                   <div id="loopDevices" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setFilter('loop_devices', 'max loop devices ','0')">Max loop devices: 0</li>
+                        <li class="filter-category" onclick="setFilter('loop_devices.sh', 'max_loop_devices ','0')">Max loop devices: 0</li>
                      </ul>
                   </div>
                   <div id="containerEnabled" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setFilter('running_container', 'RunningIn','Docker')">Docker</li>
-                        <li class="filter-category" onclick="setFilter('running_container', 'RunningIn','Singularity')">Singularity</li>
+                        <li class="filter-category" onclick="setFilter('running_container.sh', 'RUNNING_IN','Docker')">Docker</li>
+                        <li class="filter-category" onclick="setFilter('running_container.sh', 'RUNNING_IN','Singularity')">Singularity</li>
                      </ul>
                   </div>
                   <div id="uname" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setFilter('os', 'ID','centos')">OS id: centos</li>
-                        <li class="filter-category" onclick="setFilter('os', 'NAME','CentOS Linux')">OS name: CentOs Linux</li>
-                        <li class="filter-category" onclick="setFilter('os', 'VERSION','7 (Core)')">OS version: 7 (Core)</li>
+                        <li class="filter-category" onclick="setFilter('os.sh', 'OS_ID','centos')">OS id: centos</li>
+                        <li class="filter-category" onclick="setFilter('os.sh', 'OS_NAME','CentOS Linux')">OS name: CentOs Linux</li>
+                        <li class="filter-category" onclick="setFilter('os.sh', 'OS_VERSION','7 (Core)')">OS version: 7 (Core)</li>
                      </ul>
                   </div>
                   <div id="singularity" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onClick="setFilter('singularity', 'SINGULARITY_CVMFS_SUPPORTED','TRUE')">Support singularity</li>
-                        <li class="filter-category" onClick="setFilter('singularity', 'SINGULARITY_CVMFS_SUPPORTED','FALSE')">Not support singularity</li>
+                        <li class="filter-category" onClick="setFilter('singularity.sh', 'SINGULARITY_CVMFS_SUPPORTED','TRUE')">Support singularity</li>
+                        <li class="filter-category" onClick="setFilter('singularity.sh', 'SINGULARITY_CVMFS_SUPPORTED','FALSE')">Not support singularity</li>
                      </ul>
                   </div>
                   <div id="TMP" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onClick="setFilter('gcc_version', 'GCC_VERSION','gcc (GCC) 7.3.0')">gcc_version: gcc (GCC) 7.3.0</li>
+                        <li class="filter-category" onClick="setFilter('gcc_version.sh', 'GCC_VERSION','gcc (GCC) 7.3.0')">gcc_version: gcc (GCC) 7.3.0</li>
                      </ul>
                   </div>
                   <div id="underlay" class="filter-selected-menu">
                       <ul class="filter-list">
-                        <li class="filter-category" onclick="setFilter('underlay', 'UNDERLAY_ENABLED','yes')">Underlay enabled</li>
-                        <li class="filter-category" onclick="setFilter('underlay', 'UNDERLAY_ENABLED','no')">Underlay disabled</li>
+                        <li class="filter-category" onclick="setFilter('underlay.sh', 'UNDERLAY_ENABLED','yes')">Underlay enabled</li>
+                        <li class="filter-category" onclick="setFilter('underlay.sh', 'UNDERLAY_ENABLED','no')">Underlay disabled</li>
                      </ul>
                   </div>
                   <div id="overlay" class="filter-selected-menu">
                       <ul class="filter-list">
-                        <li class="filter-category" onclick="setFilter('overlay', 'OVERLAY_ENABLED','yes')">Overlay enabled</li>
-                        <li class="filter-category" onclick="setFilter('overlay', 'OVERLAY_ENABLED','no')">Overlay disabled</li>
+                        <li class="filter-category" onclick="setFilter('overlay.sh', 'OVERLAY_ENABLED','yes')">Overlay enabled</li>
+                        <li class="filter-category" onclick="setFilter('overlay.sh', 'OVERLAY_ENABLED','no')">Overlay disabled</li>
                      </ul>
                   </div>
                </div>
@@ -397,50 +397,50 @@
                   <br></br>
                   <div id="HMDGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setParameters('cpu_info', 'cpu cores','32')">CPU cores: 32</li>
-                        <li class="filter-category" onclick="setParameters('cpu_info', 'wp','yes')">WP: yes</li>
-                        <li class="filter-category" onclick="setParameters('cpu_info', 'fpu','yes')">FPU: yes</li>
+                        <li class="filter-category" onclick="setParameters('cpu_info.sh', 'CPU_cpu_cores','32')">CPU cores: 32</li>
+                        <li class="filter-category" onclick="setParameters('cpu_info.sh', 'CPU_wp','TRUE')">WP: yes</li>
+                        <li class="filter-category" onclick="setParameters('cpu_info.sh', 'CPU_fpu','yes')">FPU: yes</li>
                      </ul>
                   </div>
                   <div id="loopDevicesGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setParameters('loop_devices', 'max loop devices ','0')">Max loop devices: 0</li>
+                        <li class="filter-category" onclick="setParameters('loop_devices.sh', 'max_loop_devices ','0')">Max loop devices: 0</li>
                      </ul>
                   </div>
                   <div id="containerEnabledGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setParameters('running_container', 'RunningIn','Docker')">Docker</li>
-                        <li class="filter-category" onclick="setParameters('running_container', 'RunningIn','Singularity')">Singularity</li>
+                        <li class="filter-category" onclick="setParameters('running_container.sh', 'RUNNING_IN','Docker')">Docker</li>
+                        <li class="filter-category" onclick="setParameters('running_container.sh', 'RUNNING_IN','Singularity')">Singularity</li>
                      </ul>
                   </div>
                   <div id="unameGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setParameters('os', 'ID','centos')">OS id: centos</li>
-                        <li class="filter-category" onclick="setParameters('os', 'NAME','CentOS Linux')">OS name: CentOs Linux</li>
-                        <li class="filter-category" onclick="setParameters('os', 'VERSION','7 (Core)')">OS version: 7 (Core)</li>
+                        <li class="filter-category" onclick="setParameters('os.sh', 'OS_ID','centos')">OS id: centos</li>
+                        <li class="filter-category" onclick="setParameters('os.sh', 'OS_NAME','CentOS Linux')">OS name: CentOs Linux</li>
+                        <li class="filter-category" onclick="setParameters('os.sh', 'OS_VERSION','7 (Core)')">OS version: 7 (Core)</li>
                      </ul>
                   </div>
                   <div id="singularityGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setParameters('singularity', 'SINGULARITY_CVMFS_SUPPORTED','TRUE')">Support singularity</li>
-                        <li class="filter-category" onclick="setParameters('singularity', 'SINGULARITY_CVMFS_SUPPORTED','FALSE')">Not support singularity</li>
+                        <li class="filter-category" onclick="setParameters('singularity.sh', 'SINGULARITY_CVMFS_SUPPORTED','TRUE')">Support singularity</li>
+                        <li class="filter-category" onclick="setParameters('singularity.sh', 'SINGULARITY_CVMFS_SUPPORTED','FALSE')">Not support singularity</li>
                      </ul>
                   </div>
                   <div id="TMPGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onClick="setParameters('gcc_version', 'GCC_VERSION','gcc (GCC) 7.3.0')">gcc_version: gcc (GCC) 7.3.0</li>
+                        <li class="filter-category" onClick="setParameters('gcc_version.sh', 'GCC_VERSION','gcc (GCC) 7.3.0')">gcc_version: gcc (GCC) 7.3.0</li>
                      </ul>
                   </div>
                   <div id="underlayGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setParameters('underlay', 'UNDERLAY_ENABLED','yes')">Underlay enabled</li>
-                        <li class="filter-category" onclick="setParameters('underlay', 'UNDERLAY_ENABLED','no')">Underlay disabled</li>
+                        <li class="filter-category" onclick="setParameters('underlay.sh', 'UNDERLAY_ENABLED','yes')">Underlay enabled</li>
+                        <li class="filter-category" onclick="setParameters('underlay,.sh', 'UNDERLAY_ENABLED','no')">Underlay disabled</li>
                      </ul>
                   </div>
                   <div id="overlayGroup" class="filter-selected-menu">
                      <ul class="filter-list">
-                        <li class="filter-category" onclick="setParameters('overlay', 'OVERLAY_ENABLED','yes')">Overlay enabled</li>
-                        <li class="filter-category" onclick="setParameters('overlay', 'OVERLAY_ENABLED','no')">Overlay disabled</li>
+                        <li class="filter-category" onclick="setParameters('overlay.sh', 'OVERLAY_ENABLED','yes')">Overlay enabled</li>
+                        <li class="filter-category" onclick="setParameters('overlay.sh', 'OVERLAY_ENABLED','no')">Overlay disabled</li>
                      </ul>
                   </div>
                </div>
@@ -505,119 +505,103 @@
                <th>JSON parameters</th>
             </tr>
             <tr>
-               <td>cgroups2_checking</td>
-               <td>"CGROUPSv2 RUNNING", "CGROUPSv2 AVAILABLE"</td>
+               <td>cgroups2_checking.sh</td>
+               <td>"CGROUPSv2_AVAILABLE", "CGROUPSv2_RUNNING"</td>
             </tr>
             <tr>
-               <td>container_enabled</td>
-               <td>"SINGULARITY_BINDPATH", "SINGULARITYENV_PANDA_HOSTNAME", "SINGULARITY_FRONTIER_LOG_FILE"</td>
+               <td>container_enabled.sh</td>
+               <td>"SINGULARITY_BIND", "SINGULARITY_BINDPATH", "SINGULARITY_COMMAND", "SINGULARITY_CONTAINER", "SINGULARITY_ENVIRONMENT", "SINGULARITY_NAME", "SINGULARITYENV_PANDA_HOSTNAME", "SINGULARITYENV_FRONTIER_LOG_FILE"</td>
             </tr>
             <tr>
-               <td>cpu_info</td>
-               <td>"wp", "fpu", "bugs", "flags", "model", "apicid", "core id", "cpu MHz", "TLB size", "bogomips", "siblings", "stepping", "cpu cores", "microcode", "processor", "vendor_id", "cache size", "cpu family", "model name", "cpuid level", "physical id", "clflush size", "address sizes", "fpu_exception, "initial apicid", "cache alignment", "processor count", "power management"</td>
+               <td>cpu_info.sh</td>
+               <td>"CPU_address_sizes", "CPU_apicid", "CPU_bogomips", "CPU_cache_size", "CPU_cache_alignment", "CPU_clflush_size", "CPU_core_id", "CPU_cpu_MHz", "CPU_cpu_cores", "CPU_cpu_family", "CPU_cpuid_level", "CPU_flags", "CPU_fpu", "CPU_fpu_exception", "CPU_initial_apicid", "CPU_microcode", "CPU_model", "CPU_model_name", "CPU_physical_id", "CPU_power_management", "CPU_siblings", "CPU_stepping", "CPU_vendor_id", "CPU_wp"</td>
             </tr>
             <tr>
-               <td>cpulimit_checking</td>
-               <td>"CGROUP", "ACCOUNTING", "ACCESS QUOTA", "ACCESS PERIOD", "ALLOCATED CPUS"</td>
+               <td>cpulimit_checking.sh</td>
+               <td>"ACCESS_PERIOD", "ACCESS_QUOTA", "ACCOUNTING", "ALLOCATED_CPUS", "CGROUP"</td>
             </tr>
             <tr>
-               <td>cvmfs_version</td>
+               <td>cpuset_checking.sh</td>
+               <td>"CPUSET_ENABLED", "CPUSET_PREFIX", "CPUSET_CGROUP", "CPUSET_CPUS", "CPU_AMOUNT"</td>
+            </tr>
+            <tr>
+               <td>cvmfs_version.sh</td>
                <td>"CVMFS_VERSION"</td>
             </tr>
             <tr>
-               <td>gcc_version</td>
+               <td>gcc_version.sh</td>
                <td>"GCC_VERSION"</td>
             </tr>
             <tr>
-               <td>get_jdl_cores</td>
+               <td>get_jdl_cores.sh</td>
                <td>"ALIEN_JDL_CPUCORES"</td>
             </tr>
             <tr>
-               <td>home</td>
+               <td>home.sh</td>
                <td>"HOME"</td>
             </tr>
             <tr>
-               <td>isolcpus_checking</td>
+               <td>isolcpus_checking.sh</td>
                <td>"ISOLATED_CPUS"</td>
             </tr>
             <tr>
-               <td>lhcbmarks</td>
+               <td>lhcbmarks.sh</td>
                <td>"LHCbMarks"</td>
             </tr>
             <tr>
-               <td>loop_devices</td>
-               <td>"max loop devices "</td>
+               <td>loop_devices.sh</td>
+               <td>"shared_loop_devices", "max_loop_devices"</td>
             </tr>
             <tr>
-               <td>lsb_release</td>
+               <td>lsb_release.sh</td>
                <td>"LSB_RELEASE"</td>
             </tr>
             <tr>
-               <td>max_namespaces</td>
+               <td>max_namespaces.sh</td>
                <td>"MAX_NAMESPACES"</td>
             </tr>
             <tr>
-               <td>os</td>
-               <td>"ID", "NAME", "ID_LIKE", "VERSION", "CPE_NAME", "HOME_URL", "ANSI_COLOR", "VERSION_ID", "PRETTY_NAME", "BUG_REPORT_URL", "REDHAT_SUPPORT_PRODUCT", "CENTOS_MANTISBT_PROJECT", "REDHAT_SUPPORT_PRODUCT_VERSION", "CENTOS_MANTISBT_PROJECT_VERSION"</td>
+               <td>os.sh</td>
+               <td>"OS_ANSI_COLOR", "OS_BUG_REPORT_URL", "OS_CENTOS_MANTISBT_PROJECT", "OS_CENTOS_MANTISBT_PROJECT_VERSION", "OS_CPE_NAME", "OS_HOME_URL", "OS_ID", "OS_ID_LIKE", "OS_NAME", "OS_PRETTY_NAME", "OS_REDHAT_SUPPORT_PRODUCT", "OS_REDHAT_SUPPORT_PRODUCT_VERSION", "OS_VERSION", "OS_VERSION_ID"</td>
             </tr>
             <tr>
-               <td>overlay</td>
+               <td>overlay.sh</td>
                <td>"OVERLAY_ENABLED"</td>
             </tr>
             <tr>
-               <td>ram_info</td>
-               <td>"Slab", "Dirty", "Shmem", "Active", "Bounce", "Cached", "Mapped", "Percpu", "Buffers", "Hugetlb", "MemFree", "Mlocked", "Inactive", "MemTotal", "SwapFree", "AnonPages", "SwapTotal", "Writeback", "PageTables", "SUnreclaim", "SwapCached", "CommitLimit", "DirectMap1G", "DirectMap2M", "DirectMap4k", "KernelStack", "Unevictable", "VmallocUsed", "Active(anon)", "Active(file)", "Committed_AS", "Hugepagesize", "kReclaimable", "MemAvailable", "NFS_Unstable", "SReclaimable", "VmallocChunk", "VmallocTotal", "WritebackTmp", "AnonHugePages", "FileHugePages", "FilePmdMapped", "HugePages_Free", "HugePages_Rsvd", "HugePages_Surp", "Inactive(anon)", "Inactive(file)", "ShmemHugePages", "ShmemPmdMapped", "HugePages_Total", "HardwareCorrupted"</td>
+               <td>ram_info.sh</td>
+               <td>"RAM_kB_MemTotal", "RAM_kB_MemFree", "RAM_kB_MemAvailable", "RAM_kB_Buffers", "RAM_kB_Cached", "RAM_kB_SwapCached", "RAM_kB_Active", "RAM_kB_Inactive", "RAM_kB_Active(anon)", "RAM_kB_Inactive(anon)", "RAM_kB_Active(file)", "RAM_kB_Inactive(file)", "RAM_kB_Unevictable", "RAM_kB_Mlocked", "RAM_kB_SwapTotal", "RAM_kB_SwapFree", "RAM_kB_Dirty", "RAM_kB_Writeback", "RAM_kB_AnonPages", "RAM_kB_Mapped", "RAM_kB_Shmem", "RAM_kB_Slab", "RAM_kB_SReclaimable", "RAM_kB_SUnreclaim", "RAM_kB_KernelStack", "RAM_kB_PageTables", "RAM_kB_NFS_Unstable", "RAM_kB_Bounce", "RAM_kB_WritebackTmp", "RAM_kB_CommitLimit", "RAM_kB_Committed_AS", "RAM_kB_VmallocTotal", "RAM_kB_VmallocUsed", "RAM_kB_VmallocChunk", "RAM_kB_Percpu", "RAM_kB_HardwareCorrupted", "RAM_kB_AnonHugePages", "RAM_kB_CmaTotal", "RAM_kB_CmaFree", "RAM_HugePages_Total", "RAM_HugePages_Free", "RAM_HugePages_Rsvd", "RAM_HugePages_Surp", "RAM_kB_Hugepagesize", "RAM_kB_DirectMap4k", "RAM_kB_DirectMap1G", "RAM_kB_DirectMap2M"</td>
             </tr>
             <tr>
-               <td>running_container</td>
-               <td>"RunningIn"</td>
+               <td>running_container.sh</td>
+               <td>"RUNNING_IN"</td>
             </tr>
             <tr>
-               <td>running_container_docker</td>
-               <td>Not represented in JSON</td>
-            </tr>
-            <tr>
-               <td>running_container_singularity</td>
-               <td>Not represented in JSON</td>
-            </tr>
-            <tr>
-               <td>singularity</td>
+               <td>singularity.sh</td>
                <td>"SINGULARITY_CVMFS_SUPPORTED", "SINGULARITY_LOCAL_SUPPORTED"</td>
             </tr>
             <tr>
-               <td>taskset_checking</td>
-               <td>Not represented in JSON</td>
-            </tr>
-            <tr>
-               <td>taskset_cores</td>
-               <td>Not represented in JSON</td>
-            </tr>
-            <tr>
-               <td>taskset_other_processes</td>
+               <td>taskset_other_processes.sh</td>
                <td>"ENTRIES", "ENTRY_COUNT"</td>
             </tr>
             <tr>
-               <td>taskset_own_processes</td>
-               <td>Not represented in JSON</td>
+               <td>taskset_own_process.sh</td>
+               <td>"TASKSET"</td>
             </tr>
             <tr>
-               <td>tmp</td>
+               <td>tmp.sh</td>
                <td>"TEMP_DIR"</td>
             </tr>
             <tr>
-               <td>trial</td>
-               <td>Not represented in JSON</td>
-            </tr>
-            <tr>
-               <td>uname</td>
+               <td>uname.sh</td>
                <td>"UNAME"</td>
             </tr>
             <tr>
-               <td>underlay</td>
+               <td>underlay.sh</td>
                <td>"UNDERLAY_ENABLED"</td>
             </tr>
             <tr>
-               <td>wlcg_metapackage</td>
+               <td>wlcg_metapackage.sh</td>
                <td>"WLCG_METAPACKAGE"</td>
             </tr>
          </table> 

@@ -158,7 +158,7 @@
     //Fetch site from url
     String nodeSite = "Poznan";
 
-    String nodeTestName = "singularity";
+    String nodeTestName = "singularity.sh";
 
     String nodeMessage = "SUPPORTED";
 
@@ -176,12 +176,12 @@
 
         //No grouping but filter
         if(isFiltering){
-             sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='singularity' " + filterString);
+             sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='singularity.sh' " + filterString);
              filterDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> '" + request.getParameter("JSONFilter")  + "', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge  + "' " +  filterString);
         }
         //No filter and no grouping
         else{
-            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='singularity';");
+            sitesDB = new DB("SELECT sitesonar_tests.host_id, test_message_json -> 'SINGULARITY_CVMFS_SUPPORTED', ce_name, test_name FROM sitesonar_tests INNER JOIN sitesonar_hosts ON sitesonar_hosts.host_id = sitesonar_tests.host_id WHERE last_updated > '" + testAge + "' AND test_name='singularity.sh';");
             filterDB = new DB();//EMPTY
         }
         
@@ -202,7 +202,7 @@
     }
     
     // Group by
-    String groupingName = "singularity";
+    String groupingName = "singularity.sh";
     String groupMessage = "TRUE";
     String groupJSON = "SINGULARITY_CVMFS_SUPPORTED";
     if(request.getParameter("grouping") != null){
